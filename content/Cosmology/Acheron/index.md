@@ -30,6 +30,6 @@ Acheron remains the final capital for all known civilizations, as it represents 
 ---
 ## Navigation
 
-**External Bound:** [[Cosmology/Periphery Zero/index.md]]
+**External Bound:** [[Cosmology/Periphery Zero/index.md|Periphery Zero]]
 
-**Sub-Regions:** [[Cosmology/Acheron/Hyperion/index.md]], [[Cosmology/Acheron/Firmament/index.md]], [[Cosmology/Acheron/Protostellar Shoals/index.md]], [[Cosmology/Acheron/Penumbra/index.md]]
+**Sub-Regions:** [[Cosmology/Acheron/Hyperion/index.md|Hyperion]], [[Cosmology/Acheron/Firmament/index.md|Firmament]], [[Cosmology/Acheron/Protostellar Shoals/index.md|Protostellar Shoals]], [[Cosmology/Acheron/Penumbra/index.md|Penumbra]]

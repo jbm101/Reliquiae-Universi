@@ -29,8 +29,8 @@ Here, the "Stellar Architects" use magnetic siphons to pull hydrogen from the ga
 ---
 ## Navigation
 
-**Internal Bound:** [[Cosmology/Acheron/Hyperion/index.md]] / [[Cosmology/Acheron/Firmament/index.md]]
+**Internal Bound:** 
 
-**External Bound:** [[Cosmology/Acheron/Penumbra/index.md]]
+**External Bound:** 
 
 **Key Sectors:** TDB

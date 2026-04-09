@@ -30,6 +30,6 @@ As a result, any object that enters The Dark is "causally deleted." No light, si
 
 **Internal Bound:** [[Terminus]]
 
-**Core Mass:** [[Cosmology/Acheron/index.md]]
+**Core Mass:** [[Cosmology/Acheron/index.md|Acheron]]
 
 **Historical Record:** [[Timeline of The Dark]]

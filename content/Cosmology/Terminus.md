@@ -30,6 +30,6 @@ While the rest of the cosmos has receded into **The Dark**, Terminus remains a s
 
 **External Bound:** [[The Dark]]
 
-**Internal Bound:** [[Cosmology/Periphery Zero/index.md]]
+**Internal Bound:** [[Cosmology/Periphery Zero/index.md|Periphery Zero]]
 
 **Secondary Masses:** `TBD`

@@ -31,7 +31,7 @@ Unlike the structured sectors of **Acheron**, **Periphery Zero** is a lawless ex
 ---
 ## Navigation
 
-**Internal Bound:** [[Cosmology/Acheron/index.md]]
+**Internal Bound:** [[Cosmology/Acheron/index.md|Acheron]]
 
 **External Bound:** [[Terminus]]
 
