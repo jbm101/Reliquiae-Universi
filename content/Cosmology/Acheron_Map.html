@@ -1,0 +1,2635 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Acheron Super-Galaxy Map</title>
+        <style>
+            /* =========================================
+           1. CSS VARIABLES & RESET
+           ========================================= */
+            :root {
+                /* === FONTS & COLORS === */
+                --ui-font: "Courier New", monospace;
+                --color-bg: #000000;
+                --color-panel-bg: rgba(0, 0, 0, 0.75);
+                --color-panel-border: rgba(255, 255, 255, 0.1);
+                --color-text-muted: #888888;
+                --color-text-main: #dddddd;
+
+                /* === THEME COLORS === */
+                --theme-hyperion: #ffcc00;
+                --theme-the-dark: #550055;
+                --theme-hud-accent: #00aaff;
+                --theme-hud-tactical: #ffaa00;
+                --theme-locator: #ff6600;
+                --theme-distance: #00ff00;
+                --theme-speed: #00ffff;
+
+                /* === UTILITY SHADOWS === */
+                --shadow-depth: 0 0 8px;
+                --shadow-depth-double: 0 0 8px, 0 0 12px;
+                --shadow-depth-triple: 0 0 8px, 0 0 12px, 0 0 20px, 0 0 30px;
+                --shadow-intense: 0 0 20px, 0 0 30px;
+            }
+
+            *,
+            *::before,
+            *::after {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                background: var(--color-bg);
+                overflow: hidden;
+                width: 100vw;
+                height: 100vh;
+                font-family: var(--ui-font);
+                user-select: none;
+            }
+
+            canvas {
+                display: block;
+                width: 100% !important;
+                height: 100% !important;
+                outline: none;
+            }
+
+            /* =========================================
+           2. UI PANELS & COMPONENTS
+           ========================================= */
+            .panel {
+                position: absolute;
+                z-index: 100;
+                background: var(--color-panel-bg);
+                border: 1px solid var(--color-panel-border);
+                border-radius: 6px;
+                backdrop-filter: blur(8px);
+                padding: 15px;
+            }
+
+            #info-panel {
+                top: 20px;
+                left: 20px;
+                max-width: 350px;
+            }
+            #navigation-panel {
+                top: 20px;
+                right: 20px;
+                min-width: 160px;
+                text-align: right;
+            }
+            #controls-panel {
+                bottom: 20px;
+                left: 20px;
+                color: #999;
+                font-size: 11px;
+                line-height: 1.5;
+                max-width: 300px;
+            }
+
+            .panel-title {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 5px;
+                letter-spacing: 3px;
+                color: var(--theme-hyperion);
+                text-shadow: 0 0 15px var(--theme-hyperion);
+            }
+
+            .panel-subtitle {
+                font-size: 12px;
+                color: var(--color-text-muted);
+                margin-bottom: 15px;
+                letter-spacing: 2px;
+            }
+
+            .legend-item {
+                display: grid;
+                grid-template-columns: 16px 1fr;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 8px;
+                font-size: 11px;
+            }
+            .legend-color {
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                box-shadow: 0 0 8px currentColor;
+                flex-shrink: 0;
+            }
+            .legend-text {
+                color: var(--color-text-main);
+            }
+
+            /* Navigation Elements */
+            .navigation-data {
+                margin-top: 5px;
+            }
+
+            #location-indicator {
+                color: var(--theme-locator);
+                font-size: 12px;
+                text-shadow:
+                    var(--shadow-depth) var(--theme-depth),
+                    var(--shadow-depth-double) var(--theme-depth);
+            }
+            #shell-name {
+            }
+
+            #distance-level {
+                font-size: 14px;
+                color: var(--theme-distance);
+                text-shadow:
+                    var(--shadow-depth) var(--theme-distance),
+                    var(--shadow-depth-double) var(--theme-distance);
+            }
+
+            #speed-meter {
+                font-size: 14px;
+                color: var(--theme-speed);
+                text-shadow:
+                    var(--shadow-depth) var(--theme-speed),
+                    var(--shadow-depth-double) var(--theme-speed);
+                display: none;
+            }
+            #speed-meter.active {
+                display: block;
+            }
+
+            /* Controls */
+            .btn-toggle {
+                margin: 10px 0;
+                padding: 8px 16px;
+                background: rgba(0, 100, 200, 0.2);
+                border: 1px solid var(--theme-hud-accent);
+                color: var(--theme-hud-accent);
+                font-family: inherit;
+                font-size: 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                text-shadow: 0 0 5px var(--theme-hud-accent);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+            .btn-toggle:hover {
+                background: rgba(0, 100, 200, 0.4);
+                box-shadow: 0 0 12px var(--theme-hud-accent);
+            }
+            .btn-toggle.tactical {
+                background: rgba(200, 100, 0, 0.2);
+                border-color: var(--theme-hud-tactical);
+                color: var(--theme-hud-tactical);
+                text-shadow: 0 0 5px var(--theme-hud-tactical);
+            }
+            .btn-toggle.tactical:hover {
+                background: rgba(200, 100, 0, 0.4);
+                box-shadow: 0 0 12px var(--theme-hud-tactical);
+            }
+        </style>
+    </head>
+    <body>
+        <aside id="info-panel" class="panel">
+            <div class="panel-title">ACHERON</div>
+            <div class="panel-subtitle">ELLIPTICAL SUPER-GALAXY / SGAS-01</div>
+            <div id="legend-container"></div>
+        </aside>
+
+        <aside id="navigation-panel" class="panel">
+            <div id="location-indicator">
+                SHELL: <span id="shell-name">The Dark</span>
+            </div>
+            <div id="distance-level" class="navigation-data">150,000 ly</div>
+            <div id="speed-meter" class="navigation-data">
+                SPEED: <span id="speed-value">0</span>
+            </div>
+        </aside>
+
+        <aside id="controls-panel" class="panel">
+            <button id="movement-toggle" class="btn-toggle tactical">
+                Mode: TACTICAL</button
+            ><br />
+            <strong>Exploratory:</strong> WASDQE move, RMB-Drag steer<br />
+            <strong>Tactical:</strong> LMB-Drag orbit, Scroll to zoom
+        </aside>
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js",
+                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.183.2/examples/jsm/"
+                }
+            }
+        </script>
+
+        <script type="module">
+            /**
+             * =========================================
+             * 1. IMPORTS & CONFIGURATION
+             * =========================================
+             */
+
+            import * as THREE from "three";
+            import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+            import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+            import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+            import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
+            /**
+             * =========================================
+             * 2. CONFIGURATION & CONSTANTS
+             * =========================================
+             */
+
+            // Math.PI is used directly where needed - no need for redundant alias
+
+            // Cache CDF tables by (minRadius, maxRadius) pair to avoid recomputation
+            // Key format: "min-max" ensures unique table per configuration
+            const _plummerCdfCache = new Map();
+
+            // Create a Plummer profile radius sampler for stellar density distribution
+            // Produces realistic galactic bulge density, preferred profile
+            // Uses seeded RNG for reproducibility across reloads
+            function createPlummerRadiusSampler(minRadius, maxRadius) {
+                const effectiveRange = maxRadius - minRadius;
+                const scaleLength = maxRadius - minRadius; // Scale length for Plummer profile
+
+                // Cache key for CDF table lookup
+                const cacheKey = `${minRadius}-${maxRadius}`;
+                if (_plummerCdfCache.has(cacheKey)) {
+                    const cached = _plummerCdfCache.get(cacheKey);
+                    return cached.sampler;
+                }
+
+                // Pre-compute CDF table for inverse transform sampling
+                // CDF resolution: trade-off between memory (2KB) and sampling precision
+                const CDF_RESOLUTION_STEPS = 500;
+                const numPoints = CDF_RESOLUTION_STEPS;
+                const cdfTable = new Float32Array(numPoints);
+                let cumsum = 0;
+
+                for (let i = 0; i < numPoints; i++) {
+                    const rNorm = i / (numPoints - 1); // normalized radius [0, 1]
+                    const r = minRadius + rNorm * effectiveRange;
+                    // Plummer density with r² volume element for proper 3D distribution
+                    const density =
+                        1.0 / Math.pow(1 + Math.pow(r / scaleLength, 2), 1.5);
+                    cumsum += density;
+                    cdfTable[i] = cumsum;
+                }
+
+                // Normalize CDF so last entry is 1
+                const maxCdf = cdfTable[numPoints - 1];
+                for (let i = 0; i < numPoints; i++) {
+                    cdfTable[i] /= maxCdf;
+                }
+
+                // Create and cache the sampler function with captured closure
+                const sampler = function (rng) {
+                    // Use seeded RNG for reproducible sampling
+                    const u = rng();
+
+                    // O(1) direct lookup with linear interpolation on CDF table
+                    // Map random value u to table index, then interpolate to get radius
+                    const idx = Math.floor(u * (numPoints - 1));
+                    // Clamp to numPoints - 2 to ensure idxClamped + 1 is always a valid index
+                    // Prevents division by zero when u=1.0 (idxClamped would be numPoints-1)
+                    const idxClamped = Math.min(
+                        numPoints - 2,
+                        Math.max(0, idx),
+                    );
+                    const nextIdx = idxClamped + 1;
+
+                    // Find interpolated position in CDF table with safe divisor
+                    const denominator =
+                        cdfTable[nextIdx] - cdfTable[idxClamped];
+                    const t_cdf =
+                        denominator === 0
+                            ? 0
+                            : (u - cdfTable[idxClamped]) / denominator;
+
+                    // Interpolate radius based on normalized position
+                    const rNorm = (idxClamped + t_cdf) / (numPoints - 1);
+
+                    return Math.max(
+                        minRadius,
+                        Math.min(maxRadius, minRadius + rNorm * effectiveRange),
+                    );
+                };
+
+                // Cache the sampler for future calls with same parameters
+                _plummerCdfCache.set(cacheKey, { sampler, cdfTable });
+                return sampler;
+            }
+
+            /* =========================================
+                           SHELL CONFIGURATION (Visual & Navigation Only)
+                           ========================================= */
+            const SHELL_CONFIG = Object.freeze({
+                shellDefinitions: [
+                    {
+                        name: "Hyperion",
+                        radius: 40000,
+                        color: 0xffcc00,
+                        opacity: 0.9,
+                        rotationSpeed: { x: 0.0003, y: -0.00045 },
+                        desc: "Central Core",
+                    },
+                    {
+                        name: "Firmament",
+                        radius: 160000,
+                        color: 0xdddddd,
+                        opacity: 0.75,
+                        rotationSpeed: { x: -0.00015, y: 0.00018 },
+                        desc: "Middle Shell",
+                    },
+                    {
+                        name: "Penumbra",
+                        radius: 280000,
+                        color: 0x444444,
+                        opacity: 0.75,
+                        rotationSpeed: { x: 0.00009, y: 0.00012 },
+                        desc: "Outer Shell",
+                    },
+                    {
+                        name: "Periphery Zero",
+                        radius: 360000,
+                        color: 0x006666,
+                        opacity: 0.8,
+                        rotationSpeed: { x: -0.00006, y: -0.000075 },
+                        desc: "Edge Region",
+                    },
+                    {
+                        name: "Terminus",
+                        radius: 400000,
+                        color: 0x1a1a2e,
+                        opacity: 0.85,
+                        rotationSpeed: { x: 0.0003, y: -0.0003 },
+                        warble: true,
+                        desc: "Galaxy Boundary",
+                    },
+                ],
+                navigationZones: [
+                    { min: 0, max: 40000, name: "Hyperion", color: "#ffcc00" },
+                    {
+                        min: 40000,
+                        max: 160000,
+                        name: "Firmament",
+                        color: "#ffffff",
+                    },
+                    {
+                        min: 160000,
+                        max: 280000,
+                        name: "Penumbra",
+                        color: "#888888",
+                    },
+                    {
+                        min: 280000,
+                        max: 360000,
+                        name: "Periphery Zero",
+                        color: "#006666",
+                    },
+                    {
+                        min: 360000,
+                        max: 400000,
+                        name: "Terminus",
+                        color: "#ff00ff",
+                    },
+                    {
+                        min: 400000,
+                        max: Infinity,
+                        name: "The Dark",
+                        color: "#550055",
+                    },
+                ],
+            });
+
+            /* =========================================
+                           STAR CONFIGURATION (Independent System)
+                           ========================================= */
+            const STAR_CONFIG = {
+                // Plummer profile parameters
+                range: [5, 280000], // Galactic radius range in light-years
+                seed: 12345,
+                // Stellar Classification with probability weights
+                colors: [
+                    {
+                        color: new THREE.Color(0x5d81ff),
+                        weight: 2.5,
+                    }, // O
+                    {
+                        color: new THREE.Color(0xa2c2ff),
+                        weight: 8.2,
+                    }, // B
+                    {
+                        color: new THREE.Color(0xe3eaff),
+                        weight: 12.4,
+                    }, // A
+                    {
+                        color: new THREE.Color(0xf8f7ff),
+                        weight: 15.1,
+                    }, // F
+                    {
+                        color: new THREE.Color(0xfff4ea),
+                        weight: 18.7,
+                    }, // G
+                    {
+                        color: new THREE.Color(0xffb366),
+                        weight: 20.3,
+                    }, // K
+                    {
+                        color: new THREE.Color(0xff8533),
+                        weight: 22.8,
+                    }, // M
+                ],
+            };
+
+            // Precompute color sampling thresholds for runtime star generation (after STAR_CONFIG is defined)
+            // Format: [cumulativeThreshold, r, g, b]
+            STAR_CONFIG.starColorThresholds = (() => {
+                const totalWeight = STAR_CONFIG.colors.reduce(
+                    (sum, s) => sum + s.weight,
+                    0,
+                );
+                const colorSamplingThresholds = new Float32Array(
+                    STAR_CONFIG.colors.length * 4,
+                );
+                let cumSum = 0;
+                for (let i = 0; i < STAR_CONFIG.colors.length; i++) {
+                    const starColorConfig = STAR_CONFIG.colors[i];
+                    cumSum += starColorConfig.weight;
+                    colorSamplingThresholds[i * 4] = cumSum / totalWeight;
+                    colorSamplingThresholds[i * 4 + 1] =
+                        starColorConfig.color.r;
+                    colorSamplingThresholds[i * 4 + 2] =
+                        starColorConfig.color.g;
+                    colorSamplingThresholds[i * 4 + 3] =
+                        starColorConfig.color.b;
+                }
+                return colorSamplingThresholds;
+            })();
+
+            // Freeze after all properties are set
+            Object.freeze(STAR_CONFIG);
+
+            const ENGINE_SETTINGS = Object.freeze({
+                camera: {
+                    fov: 60,
+                    near: 0.000001,
+                    far: 1000000,
+                    minDistance: 0.47,
+                    maxDistance: 825000,
+                },
+                movement: {
+                    baseSpeed: 100,
+                    minSpeed: 0.1,
+                    maxSpeed: 1000,
+                    speedMultiplier: 1.2,
+                    rollSpeed: 2.0,
+                    turnSpeed: 0.005,
+                },
+            });
+
+            // Star colors are precomputed in STAR_CONFIG._precomputedColors
+
+            // Store reference to engine for cleanup
+            window.engine = null;
+
+            // Constant reference vectors for world coordinate system
+            // Distinct from _tempVectors scratchpad used for per-frame calculations
+            const GLOBAL_AXES = {
+                axisX: new THREE.Vector3(1, 0, 0),
+                axisY: new THREE.Vector3(0, 1, 0),
+                axisZ: new THREE.Vector3(0, 0, 1),
+            };
+
+            /**
+             * =========================================
+             * 2. UI CONTROLLER
+             * =========================================
+             */
+            class UIController {
+                // Pre-allocated Intl.NumberFormat for distance formatting (O(1) cache)
+                static _numberFormatter = new Intl.NumberFormat("en-US");
+
+                // Binary search O(log n) - zones are ordered by min distance
+                // Zones are contiguous and ordered, making binary search valid
+                // Invariant: each zone's max == next zone's min
+                static _findZone(distance) {
+                    const zones = SHELL_CONFIG.navigationZones;
+                    let left = 0;
+                    let right = zones.length - 1;
+
+                    while (left <= right) {
+                        const mid = (left + right) >> 1;
+                        if (
+                            distance >= zones[mid].min &&
+                            distance <= zones[mid].max
+                        ) {
+                            return zones[mid];
+                        }
+                        if (distance < zones[mid].min) {
+                            right = mid - 1;
+                        } else {
+                            left = mid + 1;
+                        }
+                    }
+                    return zones[zones.length - 1];
+                }
+
+                static _getShadowForZone(zoneName, color) {
+                    const SHADOW_TABLE = {
+                        Firmament: [0, 8],
+                        Penumbra: [0, 8],
+                        "Periphery Zero": [0, 8],
+                        Terminus: [20, 30],
+                        "The Dark": [20, 30],
+                    };
+                    const entry = SHADOW_TABLE[zoneName];
+                    let shadow = `0 0 ${entry ? entry[1] : 8}px ${color}`;
+                    if (entry && entry[0]) {
+                        shadow += `, 0 0 ${entry[0]}px ${color}`;
+                    }
+                    return shadow;
+                }
+
+                // Pre-built legend HTML to avoid repeated template creation
+                static _legendHTML = (() => {
+                    return (
+                        SHELL_CONFIG.shellDefinitions
+                            .map(
+                                (shell) => `
+                                                        <div class="legend-item">
+                                                            <div class="legend-color" style="background: #${shell.color.toString(16).padStart(6, "0")};
+                                                                 ${shell.name === "Terminus" ? "border: 1px solid #333;" : ""}"></div>
+                                                            <span class="legend-text">${shell.name.toUpperCase()} - ${shell.desc}</span>
+                                                        </div>
+                                                    `,
+                            )
+                            .join("") +
+                        `
+                                                        <div class="legend-item">
+                                                            <div class="legend-color" style="background: #000; border: 1px solid #333;"></div>
+                                                            <span class="legend-text">THE DARK - Beyond Horizon</span>
+                                                        </div>
+                                                    `
+                    );
+                })();
+
+                constructor() {
+                    this.dom = {
+                        toggleBtn: document.getElementById("movement-toggle"),
+                        shellName: document.getElementById("shell-name"),
+                        distanceLevel:
+                            document.getElementById("distance-level"),
+                        speedMeter: document.getElementById("speed-meter"),
+                        speedValue: document.getElementById("speed-value"),
+                        legendContainer:
+                            document.getElementById("legend-container"),
+                    };
+
+                    // State cache to prevent redundant DOM writes
+                    this.cachedDisplayState = {
+                        currentZoneName: "",
+                        lastFormattedDistance: "",
+                        lastDisplayedSpeed: "",
+                        isExplorationModeEnabled: null,
+                        lastIntDistance: -1,
+                    };
+
+                    this.dom.legendContainer.innerHTML =
+                        UIController._legendHTML;
+                }
+
+                updateHUD(distance, speed, isExplorationMode) {
+                    const intDistance = Math.round(distance);
+
+                    // Only format and update if integer distance changed
+                    if (
+                        this.cachedDisplayState.lastIntDistance !== intDistance
+                    ) {
+                        this.cachedDisplayState.lastIntDistance = intDistance;
+                        // Use cached Intl.NumberFormat to avoid locale resolution overhead
+                        const formatted =
+                            UIController._numberFormatter.format(intDistance);
+                        const newDistance = `${formatted} ly`;
+                        this.dom.distanceLevel.textContent = newDistance;
+                        this.cachedDisplayState.lastFormattedDistance =
+                            newDistance;
+
+                        // Update Shell Zone with optimized lookup (only when distance changed)
+                        const zone = UIController._findZone(distance);
+                        if (
+                            this.cachedDisplayState.currentZoneName !==
+                            zone.name
+                        ) {
+                            this.dom.shellName.textContent = zone.name;
+                            this.dom.shellName.style.color = zone.color;
+                            this.dom.shellName.style.textShadow =
+                                UIController._getShadowForZone(
+                                    zone.name,
+                                    zone.color,
+                                );
+                            this.cachedDisplayState.currentZoneName = zone.name;
+                        }
+                    }
+
+                    // Update Speed & Display Mode
+                    if (
+                        this.cachedDisplayState.isExplorationModeEnabled !==
+                        isExplorationMode
+                    ) {
+                        this.dom.speedMeter.classList.toggle(
+                            "active",
+                            isExplorationMode,
+                        );
+                        this.cachedDisplayState.isExplorationModeEnabled =
+                            isExplorationMode;
+                    }
+
+                    if (isExplorationMode) {
+                        const newSpeed = `${speed} ly/s`;
+                        if (
+                            this.cachedDisplayState.lastDisplayedSpeed !==
+                            newSpeed
+                        ) {
+                            this.dom.speedValue.textContent = newSpeed;
+                            this.cachedDisplayState.lastDisplayedSpeed =
+                                newSpeed;
+                        }
+                    }
+                }
+
+                updateToggleButton(isExplorationMode) {
+                    this.dom.toggleBtn.textContent = `Mode: ${isExplorationMode ? "EXPLORATORY" : "TACTICAL"}`;
+                    this.dom.toggleBtn.className = `btn-toggle ${isExplorationMode ? "" : "tactical"}`;
+                }
+            }
+
+            /**
+             * =========================================
+             * 3. INPUT CONTROLLER
+             * =========================================
+             */
+            class InputController {
+                constructor() {
+                    this.isExplorationMode = false;
+                    this.movementSpeed = ENGINE_SETTINGS.movement.baseSpeed;
+                    this._canvas = null;
+
+                    // Cache movement config values to avoid repeated property lookups
+                    this._config = ENGINE_SETTINGS.movement;
+
+                    this.activeActionState = {
+                        forward: false,
+                        backward: false,
+                        strafeLeft: false,
+                        strafeRight: false,
+                        rollLeft: false,
+                        rollRight: false,
+                    };
+                    this.mouseInputState = {
+                        // Tracks mouse input state for exploration mode camera control
+                        isDragging: false,
+                        lastX: 0,
+                        lastY: 0,
+                        deltaX: 0,
+                        deltaY: 0,
+                        consumed: false,
+                    };
+                    // Cache event handlers for proper cleanup in dispose()
+                    this._handlers = {
+                        keydown: null,
+                        keyup: null,
+                        mouseup: null,
+                        mousedown: null,
+                        contextmenu: null,
+                        mousemove: null,
+                        wheel: null,
+                    };
+                }
+
+                bindEvents() {
+                    this._bindEvents();
+                }
+
+                _bindEvents() {
+                    this._handlers.keydown = (e) => this._setKey(e.key, true);
+                    window.addEventListener("keydown", this._handlers.keydown, {
+                        passive: true,
+                    });
+
+                    this._handlers.keyup = (e) => this._setKey(e.key, false);
+                    window.addEventListener("keyup", this._handlers.keyup, {
+                        passive: true,
+                    });
+
+                    const canvas =
+                        this.renderer?.domElement ||
+                        document.querySelector("canvas") ||
+                        window;
+                    this._canvas = canvas;
+
+                    this._handlers.mousedown = (e) => {
+                        if (this.isExplorationMode && e.button === 2) {
+                            e.preventDefault();
+                            this.mouseInputState.isDragging = true;
+                            this.mouseInputState.lastX = e.clientX;
+                            this.mouseInputState.lastY = e.clientY;
+                            this.mouseInputState.consumed = false;
+                        }
+                    };
+                    canvas.addEventListener(
+                        "mousedown",
+                        this._handlers.mousedown,
+                        { passive: false },
+                    );
+
+                    this._handlers.contextmenu = (e) => e.preventDefault();
+                    canvas.addEventListener(
+                        "contextmenu",
+                        this._handlers.contextmenu,
+                        { passive: false },
+                    );
+
+                    this._handlers.mousemove = (e) => {
+                        if (
+                            this.isExplorationMode &&
+                            this.mouseInputState.isDragging
+                        ) {
+                            e.preventDefault();
+                            const deltaX =
+                                e.clientX - this.mouseInputState.lastX;
+                            const deltaY =
+                                e.clientY - this.mouseInputState.lastY;
+                            this.mouseInputState.deltaX += deltaX;
+                            this.mouseInputState.deltaY += deltaY;
+                            this.mouseInputState.lastX = e.clientX;
+                            this.mouseInputState.lastY = e.clientY;
+                            this.mouseInputState.consumed = false;
+                        }
+                    };
+                    canvas.addEventListener(
+                        "mousemove",
+                        this._handlers.mousemove,
+                        { passive: false },
+                    );
+
+                    this._handlers.mouseup = (e) => {
+                        if (e.button === 2) {
+                            this.mouseInputState.isDragging = false;
+                            this.mouseInputState.consumed = true;
+                        }
+                    };
+                    window.addEventListener("mouseup", this._handlers.mouseup, {
+                        passive: true,
+                    });
+
+                    this._handlers.wheel = (e) => {
+                        if (!this.isExplorationMode) return;
+                        e.preventDefault();
+                        const speedMult = this._config.speedMultiplier;
+                        const maxSpeed = this._config.maxSpeed;
+                        const minSpeed = this._config.minSpeed;
+
+                        if (e.deltaY < 0) {
+                            this.movementSpeed = Math.min(
+                                this.movementSpeed * speedMult,
+                                maxSpeed,
+                            );
+                        } else {
+                            this.movementSpeed = Math.max(
+                                this.movementSpeed / speedMult,
+                                minSpeed,
+                            );
+                        }
+                    };
+                    window.addEventListener("wheel", this._handlers.wheel, {
+                        passive: false,
+                    });
+                }
+
+                _setKey(key, isPressed) {
+                    const k = key.toLowerCase();
+
+                    // Map keys to action states
+                    const keyMap = {
+                        w: "forward",
+                        s: "backward",
+                        a: "strafeLeft",
+                        d: "strafeRight",
+                        q: "rollLeft",
+                        e: "rollRight",
+                    };
+
+                    if (k in keyMap) {
+                        const action = keyMap[k];
+                        this.activeActionState[action] = isPressed;
+                    }
+                }
+
+                consumeMouseDelta(outVector) {
+                    if (this.mouseInputState.consumed) {
+                        outVector.x = 0;
+                        outVector.y = 0;
+                        return;
+                    }
+                    outVector.x = this.mouseInputState.deltaX;
+                    outVector.y = this.mouseInputState.deltaY;
+
+                    this.mouseInputState.deltaX = 0;
+                    this.mouseInputState.deltaY = 0;
+                    this.mouseInputState.consumed = true;
+                }
+
+                dispose() {
+                    const canvas = this._canvas || window;
+
+                    // Remove all stored event listeners with explicit cleanup
+                    if (this._handlers.keydown) {
+                        window.removeEventListener(
+                            "keydown",
+                            this._handlers.keydown,
+                        );
+                    }
+                    if (this._handlers.keyup) {
+                        window.removeEventListener(
+                            "keyup",
+                            this._handlers.keyup,
+                        );
+                    }
+
+                    // Explicitly remove canvas listeners
+                    if (this._handlers.mousedown) {
+                        canvas.removeEventListener(
+                            "mousedown",
+                            this._handlers.mousedown,
+                        );
+                    }
+                    if (this._handlers.contextmenu) {
+                        canvas.removeEventListener(
+                            "contextmenu",
+                            this._handlers.contextmenu,
+                        );
+                    }
+                    if (this._handlers.mousemove) {
+                        canvas.removeEventListener(
+                            "mousemove",
+                            this._handlers.mousemove,
+                        );
+                    }
+
+                    // CRITICAL FIX: Explicitly remove window listeners for mouseup and wheel
+                    if (this._handlers.mouseup) {
+                        window.removeEventListener(
+                            "mouseup",
+                            this._handlers.mouseup,
+                        );
+                    }
+                    if (this._handlers.wheel) {
+                        window.removeEventListener(
+                            "wheel",
+                            this._handlers.wheel,
+                        );
+                    }
+                }
+            }
+
+            /**
+             * =========================================
+             * 4. GALAXY ENGINE
+             * =========================================
+             */
+            class GalaxyEngine {
+                constructor() {
+                    this.rotatingShells = [];
+                    this.coreMaterial = null;
+                    this.glowMaterial = null;
+                    this.core = null;
+                    this.glow = null;
+                    this._rafId = null;
+                    this._lastTime = performance.now();
+                    this._elapsedTime = 0;
+
+                    this.ui = new UIController();
+                    this.input = new InputController();
+
+                    this.cameraTransition = {
+                        active: false,
+                        progress: 0,
+                        startRot: new THREE.Quaternion(),
+                        endRot: new THREE.Quaternion(),
+                    };
+
+                    // Floating Origin (Origin Shifting) system
+                    // Compensates for floating-point precision loss at large distances
+                    // (32-bit floats lose precision beyond ~10^6 units)
+                    // Only shifts when camera exceeds FLOATING_ORIGIN_SHIFT_DISTANCE threshold
+                    this.floatingOffset = new THREE.Vector3(0, 0, 0);
+                    this.FLOATING_ORIGIN_TRIGGER_DISTANCE = 1000; // Distance threshold triggering re-center (reduced from 5000 for smoother transitions at Maginot distance)
+                    this._floatingOriginShiftActive = false;
+
+                    // Pre-allocated temporary vectors to eliminate GC allocations in render loop
+                    // This scratchpad pattern avoids Garbage Collection pressure in the 60FPS render loop
+                    // All vectors here are reused across frames rather than allocated per-frame
+                    this._tempVectors = {
+                        mouseDelta: new THREE.Vector2(),
+                        absolutePos: new THREE.Vector3(), // Used for UI and distance logic
+                        cameraAbsolute: new THREE.Vector3(), // For Birch World visibility culling
+                        birchAbsolute: new THREE.Vector3(), // For Birch World visibility culling
+                        qYaw: new THREE.Quaternion(), // For mouse look rotation
+                        qPitch: new THREE.Quaternion(), // For mouse look rotation
+                        qYawCached: new THREE.Quaternion(), // Cached yaw for batched rotation
+                        qPitchCached: new THREE.Quaternion(), // Cached pitch for batched rotation
+                        shiftVector: new THREE.Vector3(), // For origin shifting
+                        maginotScratch: new THREE.Vector3(), // For Maginot star rotation
+                    };
+
+                    // Pre-computed distance to avoid initial sqrt in animate loop
+                    this._lastCalculatedDistance =
+                        ENGINE_SETTINGS.camera.maxDistance;
+
+                    // Track DPR to avoid unnecessary pixel ratio resets
+                    this._lastDPR = 0;
+                    this._uiFrameCount = 0;
+                    this._disposed = false;
+                    this._resizeRafId = null;
+                    this._resizeTimeoutId = null;
+
+                    // WebGL context loss recovery tracking
+                    this._contextLost = false;
+                    this._contextRestoring = false;
+
+                    // Store handler references for proper cleanup
+                    this._handleResize = this._onWindowResize.bind(this);
+                    this._onContextLostHandler = this._onContextLost.bind(this);
+                    this._onContextRestoredHandler =
+                        this._onContextRestored.bind(this);
+
+                    this._initScene();
+                    this._buildGalaxy();
+
+                    // Pass renderer to InputController and bind events after canvas exists
+                    this.input.renderer = this.renderer;
+                    this.input.bindEvents();
+
+                    // Set up WebGL context loss recovery
+                    this._setupContextRecovery();
+
+                    this._rafId = requestAnimationFrame(this.animate);
+                }
+
+                shiftOrigin() {
+                    if (this._floatingOriginShiftActive) return;
+                    this._floatingOriginShiftActive = true;
+
+                    // 1. Get the exact camera position using pre-allocated vector
+                    const shiftVector = this._tempVectors.shiftVector.copy(
+                        this.camera.position,
+                    );
+
+                    // 2. Move every root object in the scene in the opposite direction
+                    this.scene.children.forEach((child) => {
+                        // Don't shift the camera itself if it's somehow in the scene children
+                        if (child === this.camera) return;
+
+                        child.position.sub(shiftVector);
+                    });
+
+                    // 3. Accumulate this shift into our global tracker
+                    this.floatingOffset.add(shiftVector);
+
+                    // 4. Snap the camera back to origin
+                    this.camera.position.set(0, 0, 0);
+                    this.camera.updateMatrixWorld(true);
+
+                    // 5. Update OrbitControls target so rotation doesn't break when re-enabled
+                    // Only call update() if controls are enabled (not in exploratory mode)
+                    if (this.controls) {
+                        this.controls.target.sub(shiftVector);
+                        if (this.controls.enabled) {
+                            this.controls.update();
+                        }
+                    }
+
+                    this._floatingOriginShiftActive = false;
+                }
+
+                _initScene() {
+                    this.scene = new THREE.Scene();
+                    this.scene.background = new THREE.Color(0x000000);
+
+                    this.camera = new THREE.PerspectiveCamera(
+                        ENGINE_SETTINGS.camera.fov,
+                        window.innerWidth / window.innerHeight,
+                        ENGINE_SETTINGS.camera.near,
+                        ENGINE_SETTINGS.camera.far,
+                    );
+                    this.camera.position.set(
+                        0,
+                        0,
+                        ENGINE_SETTINGS.camera.maxDistance,
+                    );
+
+                    this.renderer = new THREE.WebGLRenderer({
+                        antialias: true,
+                        alpha: true,
+                        powerPreference: "high-performance",
+                        logarithmicDepthBuffer: true,
+                    });
+                    // CRITICAL MIGRATION: outputEncoding deprecated, use outputColorSpace
+                    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+                    this.renderer.setSize(
+                        window.innerWidth,
+                        window.innerHeight,
+                    );
+                    this.renderer.setPixelRatio(
+                        Math.min(window.devicePixelRatio, 2),
+                    );
+                    this._lastDPR = this.renderer.getPixelRatio();
+                    document.body.appendChild(this.renderer.domElement);
+
+                    this.controls = new OrbitControls(
+                        this.camera,
+                        this.renderer.domElement,
+                    );
+                    this.controls.enableDamping = true;
+                    this.controls.dampingFactor = 0.05;
+                    this.controls.minDistance =
+                        ENGINE_SETTINGS.camera.minDistance;
+                    this.controls.maxDistance =
+                        ENGINE_SETTINGS.camera.maxDistance;
+                    this.controls.enablePan = false;
+
+                    this._toggleHandler = () => {
+                        if (this.cameraTransition.active) return;
+
+                        this.input.isExplorationMode =
+                            !this.input.isExplorationMode;
+                        this.ui.updateToggleButton(
+                            this.input.isExplorationMode,
+                        );
+
+                        if (this.input.isExplorationMode) {
+                            this.controls.enabled = false;
+                            this.input.activeActionState = {
+                                forward: false,
+                                backward: false,
+                                strafeLeft: false,
+                                strafeRight: false,
+                                rollLeft: false,
+                                rollRight: false,
+                            };
+                        } else {
+                            this.ui.dom.toggleBtn.disabled = true;
+                            this.triggerCameraTransition();
+                        }
+                    };
+                    this.ui.dom.toggleBtn.addEventListener(
+                        "click",
+                        this._toggleHandler,
+                    );
+
+                    // Use stored handler reference for proper cleanup
+                    window.addEventListener("resize", this._handleResize);
+                }
+
+                _onWindowResize() {
+                    // Prevent resize operations during context restoration
+                    if (
+                        this._contextLost ||
+                        this._contextRestoring ||
+                        !this.renderer
+                    ) {
+                        return;
+                    }
+
+                    // Debounce resize to prevent VRAM thrashing from constant buffer reallocation
+                    if (this._resizeTimeoutId) {
+                        clearTimeout(this._resizeTimeoutId);
+                    }
+
+                    this._resizeTimeoutId = setTimeout(() => {
+                        this._resizeTimeoutId = null;
+
+                        if (
+                            this._disposed ||
+                            this._contextLost ||
+                            this._contextRestoring
+                        ) {
+                            return;
+                        }
+
+                        // Set Pixel Ratio FIRST to avoid double-allocation of memory buffers
+                        const newDPR = Math.min(window.devicePixelRatio, 2);
+                        if (this._lastDPR !== newDPR) {
+                            this.renderer.setPixelRatio(newDPR);
+                            this._lastDPR = newDPR;
+                        }
+
+                        const width = window.innerWidth;
+                        const height = window.innerHeight;
+
+                        this.camera.aspect = width / height;
+                        this.camera.updateProjectionMatrix();
+
+                        this.renderer.setSize(width, height);
+
+                        if (this.effectComposer) {
+                            this.effectComposer.setSize(width, height);
+                        }
+                    }, 150); // Wait 150ms after user stops dragging before reallocating buffers
+                }
+
+                _setupContextRecovery() {
+                    // Listen for WebGL context loss events
+                    const canvas = this.renderer.domElement;
+
+                    // Prevent default context loss behavior (shows warning dialog)
+                    canvas.addEventListener(
+                        "webglcontextlost",
+                        this._onContextLostHandler,
+                        false,
+                    );
+
+                    // Handle context restoration - MUST bind to canvas, not document
+                    canvas.addEventListener(
+                        "webglcontextrestored",
+                        this._onContextRestoredHandler,
+                        false,
+                    );
+                }
+
+                _onContextLost(event) {
+                    event.preventDefault();
+                    console.warn("WebGL context lost, attempting recovery...");
+                    this._contextLost = true;
+                    this._contextRestoring = true;
+
+                    // Cancel any pending resize operations
+                    if (this._resizeRafId) {
+                        cancelAnimationFrame(this._resizeRafId);
+                        this._resizeRafId = null;
+                    }
+
+                    // Stop animation loop during context loss
+                    if (this._rafId) {
+                        cancelAnimationFrame(this._rafId);
+                        this._rafId = null;
+                    }
+                }
+
+                _onContextRestored() {
+                    console.log("WebGL context restored successfully");
+                    this._contextLost = false;
+                    this._contextRestoring = false;
+
+                    // Keep listening for future context loss events
+
+                    // Force resize to rebuild EffectComposer render targets
+                    // Without this, the screen stays black because old buffers are dead
+                    this._onWindowResize();
+
+                    // Restart the animation loop
+                    this._lastTime = performance.now();
+                    this._rafId = requestAnimationFrame(this.animate);
+                }
+
+                triggerCameraTransition() {
+                    const t = this.cameraTransition;
+                    t.active = true;
+                    t.progress = 0;
+                    t.startRot.copy(this.camera.quaternion);
+                    // Compute rotation to face galaxy center from current position
+                    t.endRot.setFromRotationMatrix(
+                        new THREE.Matrix4().lookAt(
+                            this.camera.position,
+                            this.floatingOffset.clone().negate(),
+                            GLOBAL_AXES.axisY,
+                        ),
+                    );
+                }
+
+                _buildGalaxy() {
+                    // Render all visual shells (independent from star system)
+                    SHELL_CONFIG.shellDefinitions.forEach((config) => {
+                        const shell = this.createShell(config);
+                        this.scene.add(shell);
+                        // Add to rotating shells list if shell has rotationSpeed
+                        if (shell.userData.rotationSpeed) {
+                            this.rotatingShells.push(shell);
+                        }
+                    });
+                    // Create the background galaxy stars first
+                    this.createStars(STAR_CONFIG);
+                    this.createBirchWorld();
+                }
+
+                createShell(config) {
+                    const detail = Math.max(
+                        1,
+                        Math.floor(config.radius / 50000),
+                    );
+                    const geometry = new THREE.IcosahedronGeometry(
+                        config.radius,
+                        detail,
+                    );
+                    let material;
+
+                    if (config.warble) {
+                        material = new THREE.ShaderMaterial({
+                            uniforms: {
+                                time: { value: 0.0 },
+                                color: { value: new THREE.Color(config.color) },
+                            },
+                            vertexShader: `
+                                        uniform float time;
+                                        void main() {
+                                            float angle = atan(position.y, position.x);
+                                            float radius = length(position);
+                                            float displacement = sin(angle * 12.0 + time * 8.0) * 0.003 +
+                                                                 sin(angle * 18.0 + time * 12.0) * 0.002 +
+                                                                 sin(angle * 24.0 + time * 16.0) * 0.001;
+                                            vec3 newPosition = position + normalize(position) * (displacement * radius);
+                                            gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+                                        }
+                                    `,
+                            fragmentShader: `
+                                                        uniform vec3 color;
+                                                        void main() {
+                                                            gl_FragColor = vec4(color, 1.0);
+                                                            #include <colorspace_fragment>
+                                                        }
+                                                    `,
+                            wireframe: true,
+                            transparent: true,
+                            side: THREE.BackSide,
+                        });
+                    } else {
+                        material = new THREE.MeshBasicMaterial({
+                            color: config.color,
+                            wireframe: true,
+                            transparent: true,
+                            opacity: config.opacity,
+                            side: THREE.BackSide,
+                        });
+                    }
+
+                    const shell = new THREE.Mesh(geometry, material);
+                    if (config.warble) {
+                        shell.userData.warbleMaterial = material;
+                    }
+                    // Enable GPU frustum culling for large shell meshes when camera zoomed into core
+                    shell.frustumCulled = true;
+                    geometry.computeBoundingSphere();
+                    // Set rotation speed if config has it
+                    if (config.rotationSpeed) {
+                        shell.userData.rotationSpeed = config.rotationSpeed;
+                    }
+                    return shell;
+                }
+
+                createStars(config) {
+                    // Generate total star count based on configuration
+                    const count = 150000; // Fixed star count for consistent experience
+                    const positions = new Float32Array(count * 3);
+                    const colors = new Float32Array(count * 3);
+                    const distances = new Float32Array(count);
+
+                    // Use precomputed color sampling thresholds from STAR_CONFIG
+                    const parsedColors = config.starColorThresholds;
+
+                    // Pre-calculate range delta for performance
+                    const rangeDelta = config.range[1] - config.range[0];
+
+                    // Use module-scoped CDF table (computed once at initialization)
+                    const plummSampler = createPlummerRadiusSampler(
+                        5, // minRadius - stars start here, creating empty core (0-5 ly)
+                        config.range[1],
+                    );
+
+                    // Hoist plummRng closure outside loop to avoid 150,000 closure allocations
+                    const totalStars = count;
+                    let starIndex = 0;
+                    let rngState = 0;
+                    const plummRng = () => rngState / 0xffffffff;
+                    while (starIndex < totalStars) {
+                        // Inline LCG with starIndex-based seed (no closure allocation)
+                        // Golden ratio hash ensures good distribution across star indices
+                        rngState =
+                            ((starIndex * 0x9e3779b9) >>> 0) ^ config.seed;
+                        // LCG step 1 for Plummer radius sampling
+                        rngState = (rngState * 1103515245 + 12345) >>> 0;
+
+                        // Sample radius from Plummer distribution
+                        const r = plummSampler(plummRng);
+
+                        // LCG step 2 for z coordinate
+                        rngState = (rngState * 1103515245 + 12345) >>> 0;
+                        const z = (rngState / 0xffffffff) * 2 - 1;
+
+                        // LCG step 3 for rxy calculation
+                        rngState = (rngState * 1103515245 + 12345) >>> 0;
+                        const rxy = Math.sqrt(Math.max(0, 1 - z * z));
+
+                        // LCG step 4 for theta
+                        rngState = (rngState * 1103515245 + 12345) >>> 0;
+                        const theta = (rngState / 0xffffffff) * (Math.PI * 2);
+
+                        const cosTheta = Math.cos(theta);
+                        const sinTheta = Math.sin(theta);
+
+                        positions[starIndex * 3] = r * rxy * cosTheta;
+                        positions[starIndex * 3 + 1] = r * rxy * sinTheta;
+                        positions[starIndex * 3 + 2] = r * z;
+
+                        // Store distance for depth-based alpha fading
+                        distances[starIndex] = r;
+
+                        // LCG step 5 for color selection
+                        rngState = (rngState * 1103515245 + 12345) >>> 0;
+                        let choice = rngState / 0xffffffff;
+                        let left = 0,
+                            right = parsedColors.length / 4 - 1;
+
+                        while (left < right) {
+                            const mid = (left + right) >> 1;
+
+                            if (choice < parsedColors[mid * 4]) right = mid;
+                            else left = mid + 1;
+                        }
+                        const starR = parsedColors[left * 4 + 1];
+                        const starG = parsedColors[left * 4 + 2];
+                        const starB = parsedColors[left * 4 + 3];
+
+                        colors[starIndex * 3] = starR;
+                        colors[starIndex * 3 + 1] = starG;
+                        colors[starIndex * 3 + 2] = starB;
+
+                        starIndex++;
+                    }
+
+                    const geometry = new THREE.BufferGeometry();
+                    geometry.setAttribute(
+                        "position",
+                        new THREE.BufferAttribute(positions, 3),
+                    );
+                    geometry.setAttribute(
+                        "color",
+                        new THREE.BufferAttribute(colors, 3),
+                    );
+                    geometry.setAttribute(
+                        "distance",
+                        new THREE.BufferAttribute(distances, 1),
+                    );
+                    geometry.computeBoundingSphere();
+
+                    // Custom shader material with depth-based alpha fading
+                    const material = new THREE.ShaderMaterial({
+                        uniforms: {
+                            baseSize: { value: 1.0 },
+                            maxDistance: { value: config.range[1] },
+                        },
+                        vertexShader: `
+                            attribute float distance;
+                            attribute vec3 color;
+                            varying vec3 vColor;
+                            varying float vDistance;
+                            uniform float baseSize;
+                            uniform float maxDistance;
+
+                            void main() {
+                                vColor = color;
+                                vDistance = distance;
+
+                                // Size attenuation based on distance
+                                float distanceFactor = 1.0 - (distance / maxDistance) * 0.3;
+                                vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                                gl_PointSize = baseSize * distanceFactor * (300.0 / -mvPosition.z);
+                                gl_Position = projectionMatrix * mvPosition;
+                            }
+                        `,
+                        fragmentShader: `
+                            varying vec3 vColor;
+                            varying float vDistance;
+                            uniform float maxDistance;
+
+                            void main() {
+                                // Circular star shape
+                                vec2 coord = gl_PointCoord - vec2(0.5);
+                                float dist = length(coord);
+                                if (dist > 0.5) discard;
+
+                                // Soft edge glow
+                                float alpha = 1.0 - (dist * 2.0);
+                                alpha = pow(alpha, 1.5);
+
+                                // Fade distant stars (distance-based alpha reduction)
+                                float depthFade = 1.0 - (vDistance / maxDistance) * 0.3;
+                                alpha *= depthFade;
+
+                                gl_FragColor = vec4(vColor, alpha);
+                            }
+                        `,
+                        transparent: true,
+                        depthWrite: false,
+                        blending: THREE.AdditiveBlending,
+                    });
+                    const stars = new THREE.Points(geometry, material);
+                    // Enable frustum culling for off-screen star systems
+                    stars.frustumCulled = true;
+                    this.scene.add(stars);
+                }
+
+                createBirchWorld() {
+                    const group = new THREE.Group();
+                    const BIRCH_WORLD_RADIUS = 0.47;
+                    const plateSeparation = 0.9; // 10% gap for energy trenches
+
+                    // ========== STEP 1: PROCEDURAL HEX/PENT GEOMETRY ==========
+                    const baseGeo = new THREE.IcosahedronGeometry(
+                        BIRCH_WORLD_RADIUS,
+                        1,
+                    );
+                    const positionAttribute = baseGeo.attributes.position;
+                    // If geometry is non-indexed, create index array for faces
+                    let indexAttribute = baseGeo.index;
+                    if (!indexAttribute) {
+                        // For non-indexed geometry, every 3 consecutive vertices form a face
+                        // Create index array with vertex indices for each face
+                        const numFaces = positionAttribute.count / 3;
+                        const indexArray = new Uint32Array(numFaces * 3);
+                        for (let i = 0; i < numFaces; i++) {
+                            indexArray[i * 3 + 0] = i * 3 + 0;
+                            indexArray[i * 3 + 1] = i * 3 + 1;
+                            indexArray[i * 3 + 2] = i * 3 + 2;
+                        }
+                        indexAttribute = {
+                            array: indexArray,
+                            count: indexArray.length,
+                        };
+                    }
+
+                    // 1a. Merge duplicate vertices (Three.js creates duplicates for UV seams)
+                    const uniqueVertices = [];
+                    const vertexMap = new Map();
+                    for (let i = 0; i < positionAttribute.count; i++) {
+                        const vertexX =
+                            Math.round(positionAttribute.getX(i) * 10000) /
+                            10000;
+                        const vertexY =
+                            Math.round(positionAttribute.getY(i) * 10000) /
+                            10000;
+                        const vertexZ =
+                            Math.round(positionAttribute.getZ(i) * 10000) /
+                            10000;
+                        const key = `${vertexX},${vertexY},${vertexZ}`;
+                        if (!vertexMap.has(key)) {
+                            uniqueVertices.push(
+                                new THREE.Vector3(vertexX, vertexY, vertexZ),
+                            );
+                            vertexMap.set(key, uniqueVertices.length - 1);
+                        }
+                        vertexMap.set(i, vertexMap.get(key));
+                    }
+
+                    // 1b. Map faces to their connected vertices to find the dual polygons
+                    const vertexFaces = Array.from(
+                        { length: uniqueVertices.length },
+                        () => [],
+                    );
+                    for (let i = 0; i < indexAttribute.count; i += 3) {
+                        const a = vertexMap.get(indexAttribute.array[i]);
+                        const b = vertexMap.get(indexAttribute.array[i + 1]);
+                        const c = vertexMap.get(indexAttribute.array[i + 2]);
+
+                        // The center of the triangle becomes a corner of our new hex/pent plate
+                        const faceCenter = new THREE.Vector3()
+                            .add(uniqueVertices[a])
+                            .add(uniqueVertices[b])
+                            .add(uniqueVertices[c])
+                            .divideScalar(3);
+
+                        // Project back onto the sphere so the plates curve slightly
+                        faceCenter
+                            .normalize()
+                            .multiplyScalar(BIRCH_WORLD_RADIUS);
+
+                        vertexFaces[a].push(faceCenter);
+                        vertexFaces[b].push(faceCenter);
+                        vertexFaces[c].push(faceCenter);
+                    }
+
+                    // ========== STEP 2: CREATE INDEPENDENT ARMOR PLATES ==========
+                    const armorMaterial = new THREE.MeshStandardMaterial({
+                        color: 0x050505, // Deep Charcoal
+                        metalness: 1.7,
+                        roughness: 0.6,
+                        side: THREE.DoubleSide, // Prevents invisible plates from winding orders
+                        flatShading: true,
+                    });
+
+                    const armorPlates = [];
+
+                    for (let i = 0; i < uniqueVertices.length; i++) {
+                        const center = uniqueVertices[i];
+                        const normal = center.clone().normalize();
+                        const centroids = vertexFaces[i]; // The corners of the hex/pent
+
+                        // Sort the corners rotationally so they form a proper polygon
+                        const tangent = new THREE.Vector3();
+                        if (Math.abs(normal.y) > 0.9) tangent.set(1, 0, 0);
+                        else tangent.set(0, 1, 0);
+                        tangent.cross(normal).normalize();
+                        const bitangent = new THREE.Vector3()
+                            .crossVectors(normal, tangent)
+                            .normalize();
+
+                        // O(n) angle pre-computation for sort instead of O(n log n) trig
+                        const angledCentroids = new Array(centroids.length);
+                        const centerSub = center.clone();
+                        for (let i = 0; i < centroids.length; i++) {
+                            const centroidPoint = centroids[i];
+                            const direction = centroidPoint
+                                .clone()
+                                .sub(centerSub);
+                            angledCentroids[i] = {
+                                c: centroidPoint,
+                                angle: Math.atan2(
+                                    direction.dot(bitangent),
+                                    direction.dot(tangent),
+                                ),
+                            };
+                        }
+                        angledCentroids.sort((a, b) => a.angle - b.angle);
+                        const sortedCentroids = angledCentroids.map(
+                            (item) => item.c,
+                        );
+
+                        // Scale the corners inward to create the energy trenches (use sorted order)
+                        const scaledCentroids = sortedCentroids.map(
+                            (centroidPoint) => {
+                                const dir = centroidPoint.clone().sub(center);
+                                return center
+                                    .clone()
+                                    .add(dir.multiplyScalar(plateSeparation));
+                            },
+                        );
+
+                        // Build the geometry
+                        const plateVertices = [];
+                        const numPoints = scaledCentroids.length;
+                        for (let j = 0; j < numPoints; j++) {
+                            // Use scaledCentroids instead of sortedCentroids to show the gaps
+                            const firstPoint = scaledCentroids[j];
+                            const secondPoint =
+                                scaledCentroids[(j + 1) % numPoints];
+
+                            // Translate to local space to fix the "hairy ball" rotation bug
+                            const vertex1 = firstPoint.clone().sub(center);
+                            const vertex2 = secondPoint.clone().sub(center);
+
+                            plateVertices.push(0, 0, 0); // Center of the plate
+                            plateVertices.push(vertex1.x, vertex1.y, vertex1.z);
+                            plateVertices.push(vertex2.x, vertex2.y, vertex2.z);
+                        }
+
+                        const plateGeo = new THREE.BufferGeometry();
+                        plateGeo.setAttribute(
+                            "position",
+                            new THREE.Float32BufferAttribute(plateVertices, 3),
+                        );
+                        plateGeo.computeVertexNormals();
+
+                        const plate = new THREE.Mesh(plateGeo, armorMaterial);
+                        plate.position.copy(center);
+                        plate.material.side = THREE.DoubleSide;
+                        plate.userData = {
+                            initialPosition: center.clone(),
+                            dir: center.clone().normalize(),
+                            floatOffset: Math.random() * Math.PI * 2,
+                            speed: 0.2 + Math.random() * 0.5,
+                            rotationOffset: Math.random() * Math.PI * 2,
+                            rotationSpeed: 0.1 + Math.random() * 0.2,
+                        };
+
+                        armorPlates.push(plate);
+                        group.add(plate);
+                    }
+
+                    // ========== STEP 3: CORE EMISSION SOURCE ==========
+                    // Inner sphere at Starburst Blue #AABFFF
+                    const coreRadius = BIRCH_WORLD_RADIUS * 0.95;
+                    const coreMaterial = new THREE.ShaderMaterial({
+                        uniforms: {
+                            time: { value: 0 },
+                            color: { value: new THREE.Color(0xaabfff) },
+                        },
+                        vertexShader: `
+                                        #include <common>
+                                        #include <logdepthbuf_pars_vertex>
+                                        varying vec3 vNormal;
+                                        varying vec3 vViewPosition;
+                                        void main() {
+                                            vNormal = normalize(normalMatrix * normal);
+                                            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+                                            vViewPosition = -mvPosition.xyz;
+                                            gl_Position = projectionMatrix * mvPosition;
+                                            #include <logdepthbuf_vertex>
+                                        }
+                                    `,
+                        fragmentShader: `
+                                    #include <common>
+                                    #include <logdepthbuf_pars_fragment>
+                                    uniform vec3 color;
+                                    void main() {
+                                        #include <logdepthbuf_fragment>
+                                        // Uniform brightness for trench bloom - no edge Fresnel
+                                        float coreBrightness = 1.2;
+                                        gl_FragColor = vec4(color * coreBrightness, coreBrightness);
+                                        #include <colorspace_fragment>
+                                    }
+                                `,
+                        transparent: true,
+                    });
+                    const coreGeo = new THREE.SphereGeometry(
+                        coreRadius,
+                        64,
+                        64,
+                    );
+                    const core = new THREE.Mesh(coreGeo, coreMaterial);
+                    group.add(core);
+                    this.core = core;
+                    this.coreMaterial = coreMaterial;
+
+                    // ========== STEP 4: ENHANCED CORE GLOW ==========
+                    // Multiple layered glows for volumetric energy effect
+                    const glowMaterial = new THREE.ShaderMaterial({
+                        uniforms: {
+                            glowColor: { value: new THREE.Color(0xaabfff) },
+                            coreRadius: { value: coreRadius },
+                        },
+                        vertexShader: `
+                                                                #include <common>
+                                                                #include <logdepthbuf_pars_vertex>
+                                                                varying vec3 vNormal;
+                                                                varying vec3 vWorldPosition;
+                                                                void main() {
+                                                                    vNormal = normalize(normalMatrix * normal);
+                                                                    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+                                                                    vWorldPosition = worldPosition.xyz;
+
+                                                                    // FP64→FP32 truncation avoided: position computed on CPU before GPU upload
+                                                                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                                                                    #include <logdepthbuf_vertex>
+                                                                }
+                                                            `,
+                        fragmentShader: `
+                                                                            #include <common>
+                                                                            #include <logdepthbuf_pars_fragment>
+                                                                            uniform vec3 glowColor;
+                                                                            varying vec3 vNormal;
+                                                                            void main() {
+                                                                                #include <logdepthbuf_fragment>
+                                                                                float intensity = pow(0.6 - dot(vNormal, vec3(0, 0, 1.0)), 4.0);
+                                                                                gl_FragColor = vec4(glowColor, 1.0) * intensity * 2.5;
+                                                                                #include <colorspace_fragment>
+                                                                            }
+                                                                        `,
+                        side: THREE.BackSide,
+                        transparent: true,
+                        depthWrite: true,
+                    });
+
+                    const glowGeo = new THREE.SphereGeometry(
+                        coreRadius * 0.98,
+                        64,
+                        64,
+                    );
+                    const glow = new THREE.Mesh(glowGeo, glowMaterial);
+                    group.add(glow);
+                    this.glow = glow;
+                    this.glowMaterial = glowMaterial;
+
+                    // ========== STEP 6: POST-PROCESSING SETUP ==========
+                    // Configure bloom for energy glow in trenches
+                    this.effectComposer = new EffectComposer(this.renderer);
+                    this.effectComposer.addPass(
+                        new RenderPass(this.scene, this.camera),
+                    );
+
+                    // UnrealBloomPass parameters: resolution, strength, radius, threshold
+                    const bloomPass = new UnrealBloomPass(
+                        new THREE.Vector2(
+                            window.innerWidth,
+                            window.innerHeight,
+                        ),
+                        0.4, // strength (bloom intensity) - kept subtle
+                        0.1, // radius (spread)
+                        1.0, // threshold - set to 1.0 so only HDR flare cores trigger bloom
+                    );
+
+                    this.bloomPass = bloomPass;
+                    this.effectComposer.addPass(bloomPass);
+
+                    // ========== STEP 7: ANIMATION VARIABLES ==========
+                    this.birchWorldGroup = group;
+                    this.birchWorldGroup.userData.rotationSpeed = 0.05;
+                    this.armorPlates = armorPlates;
+                    this.scene.add(group);
+
+                    // Enable frustum culling with distance-based visibility override
+                    armorPlates.forEach((plate) => {
+                        plate.frustumCulled = true;
+                        plate.userData._visible = true;
+                    });
+                    core.frustumCulled = false;
+
+                    // ========== PHASE 2: MAGINOT DEFENSE PERIMETER ==========
+                    this.createMaginotPerimeter();
+                }
+
+                createMaginotPerimeter() {
+                    const MAGINOT_PERIMETER_RADIUS = 0.63;
+
+                    // === BUILD PROPER ICOSAHEDRON WITH ADJACENT FACES ONLY ===
+                    // Golden ratio
+                    const phi = (1 + Math.sqrt(5)) / 2;
+
+                    // 12 vertices of a regular icosahedron (using standard orientation)
+                    // Indices follow the Three.js IcosahedronGeometry convention for proper adjacency
+                    const normalizedIcosahedronVertices = [
+                        [0, 1, phi], // 0: upper front
+                        [0, -1, phi], // 1: lower front
+                        [0, 1, -phi], // 2: upper back
+                        [0, -1, -phi], // 3: lower back
+                        [1, phi, 0], // 4: right upper front
+                        [-1, phi, 0], // 5: left upper front
+                        [1, -phi, 0], // 6: right lower front
+                        [-1, -phi, 0], // 7: left lower front
+                        [phi, 0, 1], // 8: front right
+                        [-phi, 0, 1], // 9: front left
+                        [phi, 0, -1], // 10: back right
+                        [-phi, 0, -1], // 11: back left
+                    ].map((rawVertex) => {
+                        // Normalize and scale to MAGINOT_PERIMETER_RADIUS
+                        const vertexLength = Math.sqrt(
+                            rawVertex[0] ** 2 +
+                                rawVertex[1] ** 2 +
+                                rawVertex[2] ** 2,
+                        );
+                        return [
+                            (rawVertex[0] * MAGINOT_PERIMETER_RADIUS) /
+                                vertexLength,
+                            (rawVertex[1] * MAGINOT_PERIMETER_RADIUS) /
+                                vertexLength,
+                            (rawVertex[2] * MAGINOT_PERIMETER_RADIUS) /
+                                vertexLength,
+                        ];
+                    });
+
+                    // 20 faces - correctly connecting adjacent vertices
+                    // Based on Three.js IcosahedronGeometry standard vertex ordering
+                    const indices = [
+                        0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 11, 6, 6, 7, 2,
+                        6, 2, 5, 11, 10, 2, 11, 2, 1, 6, 5, 3, 3, 5, 4, 2, 3, 4,
+                        7, 3, 4, 4, 3, 8, 10, 8, 4, 6, 8, 10, 1, 8, 4, 11, 9, 8,
+                        11, 1, 9, 1, 5, 9, 7, 9, 5, 10, 9, 7,
+                    ];
+
+                    const icoGeometry = new THREE.IcosahedronGeometry(1, 0);
+                    icoGeometry.scale(
+                        MAGINOT_PERIMETER_RADIUS,
+                        MAGINOT_PERIMETER_RADIUS,
+                        MAGINOT_PERIMETER_RADIUS,
+                    );
+                    // Update vertex positions after scaling
+                    const positionAttribute = icoGeometry.attributes.position;
+                    for (let i = 0; i < positionAttribute.count; i++) {
+                        const vertexX = positionAttribute.getX(i);
+                        const vertexY = positionAttribute.getY(i);
+                        const vertexZ = positionAttribute.getZ(i);
+                        const vertexLength = Math.sqrt(
+                            vertexX ** 2 + vertexY ** 2 + vertexZ ** 2,
+                        );
+                        positionAttribute.setXYZ(
+                            i,
+                            (vertexX / vertexLength) * MAGINOT_PERIMETER_RADIUS,
+                            (vertexY / vertexLength) * MAGINOT_PERIMETER_RADIUS,
+                            (vertexZ / vertexLength) * MAGINOT_PERIMETER_RADIUS,
+                        );
+                    }
+                    positionAttribute.needsUpdate = true;
+                    icoGeometry.computeVertexNormals();
+
+                    this.maginotGroup = new THREE.Group();
+                    // SKEWED COUNTER ROTATION: Rotates opposite to Birch World, tilted like a gyroscope
+                    this.maginotGroup.userData = {
+                        rotationAxis: new THREE.Vector3(
+                            0.5,
+                            -1.0,
+                            0.3,
+                        ).normalize(),
+                        rotationSpeed: 0.017,
+                    };
+
+                    // === HIGH-FIDELITY VISUAL FLOOR STARS ===
+                    // Visual Floor Shader: Maintains constant screen size regardless of distance
+
+                    // Enhanced Vertex shader with shader-based glow (replaces lensflare)
+                    const starVertexShader = `
+                        #include <common>
+                        #include <logdepthbuf_pars_vertex>
+
+                        uniform float cameraDistance;
+                        uniform float minPixelSize;
+                        uniform float maxPixelSize;
+                        uniform float glowIntensity;
+                        varying float vOpacity;
+                        varying float vDistanceFactor;
+
+                        void main() {
+                            vec4 worldPos = modelMatrix * vec4(position, 1.0);
+                            vec4 viewPos = modelViewMatrix * vec4(position, 1.0);
+                            gl_Position = projectionMatrix * viewPos;
+
+                            #include <logdepthbuf_vertex>
+
+                            float dist = length(-viewPos.xyz);
+
+                            // Visual Floor: gl_PointSize stays constant at min size when zoomed out
+                            float sizeAtDistance = minPixelSize * (cameraDistance / dist);
+                            float finalSize = max(minPixelSize, min(sizeAtDistance, maxPixelSize));
+
+                            gl_PointSize = finalSize;
+
+                            // Fade opacity when behind Birch World
+                            vOpacity = step(0.0, gl_Position.z);
+
+                            // Calculate distance factor for glow intensity falloff
+                            vDistanceFactor = 1.0 - smoothstep(0.0, cameraDistance * 2.0, dist);
+                            vDistanceFactor = clamp(vDistanceFactor, 0.0, 1.0);
+                        }
+                    `;
+
+                    // Fragment shader with built-in glow/aura effect (replaces lensflare elements)
+                    const starFragmentShader = `
+                        #include <common>
+                        #include <logdepthbuf_pars_fragment>
+
+                        uniform vec3 starColor;
+                        uniform vec3 glowColor;
+                        uniform float glowIntensity;
+                        varying float vOpacity;
+                        varying float vDistanceFactor;
+
+                        void main() {
+                            #include <logdepthbuf_fragment>
+
+                            vec2 center = gl_PointCoord - vec2(0.5);
+                            float dist = length(center);
+
+                            if (dist > 0.6) {
+                                discard;
+                            }
+
+                            // Core star with radial gradient
+                            float coreAlpha = 1.0 - smoothstep(0.0, 0.5, dist);
+                            vec3 coreColor = starColor * coreAlpha;
+
+                            // Outer glow/aura with larger spread and falloff
+                            float glowDist = dist * 2.5;
+                            float glowAlpha = (1.0 - smoothstep(0.0, 0.8, glowDist)) * vDistanceFactor * glowIntensity;
+                            vec3 glowColorWithAlpha = glowColor * glowAlpha * 0.6;
+
+                            // Combine core and glow
+                            vec3 finalColor = coreColor + glowColorWithAlpha;
+                            float finalAlpha = max(coreAlpha * vOpacity, glowAlpha * vOpacity);
+
+                            gl_FragColor = vec4(finalColor, finalAlpha);
+                            #include <colorspace_fragment>
+                        }
+                    `;
+
+                    const starMaterial = new THREE.ShaderMaterial({
+                        uniforms: {
+                            cameraDistance: { value: 5.0 },
+                            minPixelSize: { value: 2.0 },
+                            maxPixelSize: { value: 8.0 },
+                            glowIntensity: { value: 1.2 },
+                            starColor: { value: new THREE.Color(0xaabfff) },
+                            glowColor: { value: new THREE.Color(0x6688ff) },
+                        },
+                        vertexShader: starVertexShader,
+                        fragmentShader: starFragmentShader,
+                        transparent: true,
+                        depthTest: true,
+                        depthWrite: false,
+                    });
+
+                    // Create 12 visual floor star points at icosahedron vertices
+                    const starGeometry = new THREE.BufferGeometry();
+                    const starPositions = [];
+
+                    // Use the unique normalizedIcosahedronVertices instead of positionAttribute
+                    for (
+                        let i = 0;
+                        i < normalizedIcosahedronVertices.length;
+                        i++
+                    ) {
+                        starPositions.push(
+                            normalizedIcosahedronVertices[i][0],
+                            normalizedIcosahedronVertices[i][1],
+                            normalizedIcosahedronVertices[i][2],
+                        );
+                    }
+                    starGeometry.setAttribute(
+                        "position",
+                        new THREE.Float32BufferAttribute(starPositions, 3),
+                    );
+
+                    this.maginotStars = new THREE.Points(
+                        starGeometry,
+                        starMaterial,
+                    );
+                    this.maginotStars.renderOrder = 4;
+                    this.maginotGroup.add(this.maginotStars);
+
+                    // === LENS FLARE AURAS ===
+                    // Attach flares to point lights with True Scale sizing
+                    // Store initial positions and light references for manual 64-bit rotation
+                    this.maginotStarsArray = [];
+                    this.maginotInitialPositions = [];
+
+                    for (
+                        let i = 0;
+                        i < normalizedIcosahedronVertices.length;
+                        i++
+                    ) {
+                        const starPosition = new THREE.Vector3(
+                            normalizedIcosahedronVertices[i][0],
+                            normalizedIcosahedronVertices[i][1],
+                            normalizedIcosahedronVertices[i][2],
+                        );
+
+                        const starColor = new THREE.Color(0xaabfff);
+
+                        // Point light provides local illumination
+                        const light = new THREE.PointLight(starColor, 5, 20);
+                        light.position.copy(starPosition);
+                        light.intensity = 0.5;
+                        light.distance = 10;
+                        light.decay = 2;
+                        light.castShadow = false;
+                        light.depthTest = true;
+                        light.depthWrite = false;
+
+                        // Remove lensflare - replaced by shader-based glow effect
+                        // Keep point light for local illumination
+                        this.maginotStarsArray.push(light);
+                        this.maginotInitialPositions.push({
+                            x: normalizedIcosahedronVertices[i][0],
+                            y: normalizedIcosahedronVertices[i][1],
+                            z: normalizedIcosahedronVertices[i][2],
+                        });
+                    }
+
+                    // === RELATIVISTIC TETHERS ===
+                    const tetherGeo = new THREE.EdgesGeometry(icoGeometry);
+                    const tetherMat = new THREE.ShaderMaterial({
+                        uniforms: {
+                            time: { value: 0 },
+                            baseColor: { value: new THREE.Color(0x4488ff) },
+                        },
+                        vertexShader: `
+                                        #include <common>
+                                        #include <logdepthbuf_pars_vertex>
+                                        uniform float time;
+                                        varying float vDist;
+                                        void main() {
+                                            vDist = length(position);
+                                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                                            #include <logdepthbuf_vertex>
+                                        }
+                                    `,
+                        fragmentShader: `
+                                        #include <common>
+                                        #include <logdepthbuf_pars_fragment>
+                                        uniform vec3 baseColor;
+                                        uniform float time;
+                                        void main() {
+                                            #include <logdepthbuf_fragment>
+                                            float pulse = sin(time * 3.0) * 0.5 + 0.5;
+                                            gl_FragColor = vec4(baseColor, 0.3 + pulse * 0.2);
+                                            #include <colorspace_fragment>
+                                        }
+                                    `,
+                        transparent: true,
+                        blending: THREE.AdditiveBlending,
+                        depthTest: true,
+                        depthWrite: false,
+                    });
+                    const tethers = new THREE.LineSegments(
+                        tetherGeo,
+                        tetherMat,
+                    );
+                    tethers.renderOrder = 2;
+                    this.maginotGroup.add(tethers);
+                    this.maginotTethers = { material: tetherMat };
+
+                    // === HARD-LIGHT SHIELD SKIN ===
+                    const shieldMat = new THREE.MeshBasicMaterial({
+                        color: 0x3344aa,
+                        transparent: true,
+                        opacity: 0.08,
+                        side: THREE.BackSide,
+                        blending: THREE.AdditiveBlending,
+                        depthWrite: false,
+                    });
+                    const shield = new THREE.Mesh(icoGeometry, shieldMat);
+                    shield.renderOrder = 3;
+                    shield.frustumCulled = true;
+                    this.maginotGroup.add(shield);
+                    this.maginotShield = shield;
+
+                    this.scene.add(this.maginotGroup);
+                }
+
+                // ========== MAGINOT PERIMETER ANIMATION ==========
+                animateMaginotPerimeter(deltaTime, elapsedTime) {
+                    if (!this.maginotGroup) return;
+
+                    // Counter-rotate the entire shield cage (tethers and shield still use group)
+                    const axis = this.maginotGroup.userData.rotationAxis;
+                    const speed = this.maginotGroup.userData.rotationSpeed;
+                    this.maginotGroup.rotateOnWorldAxis(
+                        axis,
+                        speed * deltaTime,
+                    );
+
+                    // Only calculate Maginot star math if visible
+                    if (this.maginotGroup.visible) {
+                        // MANUAL ROTATION FOR STARS TO PRESERVE FP64 PRECISION
+                        // JavaScript uses FP64 for Math operations; convert to 32-bit float only for WebGL positions
+                        // Prevents precision drift from accumulated floating-point errors
+                        if (
+                            this.maginotStarsArray &&
+                            this.maginotStarsArray.length > 0
+                        ) {
+                            const angleY =
+                                (elapsedTime % (Math.PI * 2)) * 0.001;
+                            const angleZ =
+                                (elapsedTime % (Math.PI * 2)) * 0.0005;
+
+                            const qY =
+                                this._tempVectors.qYawCached.setFromAxisAngle(
+                                    GLOBAL_AXES.axisY,
+                                    angleY,
+                                );
+                            const qZ =
+                                this._tempVectors.qPitchCached.setFromAxisAngle(
+                                    GLOBAL_AXES.axisZ,
+                                    angleZ,
+                                );
+
+                            for (
+                                let i = 0;
+                                i < this.maginotStarsArray.length;
+                                i++
+                            ) {
+                                const star = this.maginotStarsArray[i];
+                                const initial = this.maginotInitialPositions[i];
+
+                                const rotated = this._tempVectors.maginotScratch
+                                    .set(initial.x, initial.y, initial.z)
+                                    .applyQuaternion(qY)
+                                    .applyQuaternion(qZ);
+
+                                star.position.copy(rotated);
+                            }
+                        }
+
+                        // Pulse the tethers shader time uniform
+                        if (
+                            this.maginotTethers &&
+                            this.maginotTethers.material &&
+                            this.maginotTethers.material.uniforms.time
+                        ) {
+                            this.maginotTethers.material.uniforms.time.value =
+                                elapsedTime;
+                        }
+                    }
+                }
+
+                // ========== MAGINOT PERIMETER VISIBILITY =========
+                updateMaginotVisibility() {
+                    if (!this.maginotGroup || !this.camera) return;
+
+                    // Calculate absolute positions using floatingOffset for accurate distance measurement
+                    // Use squared distance to avoid expensive Math.sqrt()
+                    const cameraAbsolute = this._tempVectors.cameraAbsolute
+                        .copy(this.camera.position)
+                        .add(this.floatingOffset);
+
+                    const maginotAbsolute = this._tempVectors.birchAbsolute
+                        .copy(this.maginotGroup.position)
+                        .add(this.floatingOffset);
+                    const trueDistSq =
+                        cameraAbsolute.distanceToSquared(maginotAbsolute);
+                    const isVisible = trueDistSq < 22500; // 150 * 150
+
+                    // Toggle visibility of all Maginot components when distance threshold crossed
+                    if (this.maginotGroup.visible !== isVisible) {
+                        this.maginotGroup.visible = isVisible;
+                    }
+                    if (
+                        this.maginotShield &&
+                        this.maginotShield.visible !== isVisible
+                    ) {
+                        this.maginotShield.visible = isVisible;
+                    }
+                }
+
+                animateBirchWorld(deltaTime, elapsedTime) {
+                    // Rotate the entire Birch World on the Y axis
+                    if (this.birchWorldGroup) {
+                        this.birchWorldGroup.rotation.y +=
+                            this.birchWorldGroup.userData.rotationSpeed *
+                            deltaTime;
+                    }
+
+                    // Float the individual armor plates inward/outward (only if visible)
+                    if (
+                        this.armorPlates &&
+                        this.armorPlates.length > 0 &&
+                        this.armorPlates[0].visible
+                    ) {
+                        for (let i = 0; i < this.armorPlates.length; i++) {
+                            const plate = this.armorPlates[i];
+                            const plateUserData = plate.userData;
+                            if (plateUserData) {
+                                const floatPhase =
+                                    plateUserData.floatOffset +
+                                    elapsedTime * plateUserData.speed;
+                                const floatAmount =
+                                    Math.sin(floatPhase) * 0.002;
+                                plate.position
+                                    .copy(plateUserData.initialPosition)
+                                    .addScaledVector(
+                                        plateUserData.dir,
+                                        floatAmount,
+                                    );
+                            }
+                        }
+                    }
+                }
+
+                // ========== FRUSTUM CULLING ==========
+                updateBirchWorldVisibility() {
+                    if (
+                        !this.armorPlates ||
+                        !this.camera ||
+                        !this.birchWorldGroup
+                    )
+                        return;
+
+                    // Calculate absolute positions using floatingOffset for accurate distance measurement
+                    // Use pre-allocated vectors to avoid per-frame allocations
+                    const cameraAbsolute = this._tempVectors.cameraAbsolute
+                        .copy(this.camera.position)
+                        .add(this.floatingOffset);
+                    const birchAbsolute = this._tempVectors.birchAbsolute
+                        .copy(this.birchWorldGroup.position)
+                        .add(this.floatingOffset);
+                    const trueDistSq =
+                        cameraAbsolute.distanceToSquared(birchAbsolute);
+
+                    // Armor plates visibility: within 300 ly
+                    const platesVisible = trueDistSq < 90000; // 300 * 300
+
+                    // Core and glow visibility: within 800 ly
+                    const coreGlowVisible = trueDistSq < 640000; // 800 * 800
+
+                    // Show plates only when close to the Birch World (e.g., within 300 ly)
+                    for (let i = 0; i < this.armorPlates.length; i++) {
+                        const plate = this.armorPlates[i];
+                        if (plate.visible !== platesVisible) {
+                            plate.visible = platesVisible;
+                        }
+                    }
+
+                    // Hide core and glow when beyond 800 ly
+                    if (this.birchWorldGroup.children) {
+                        for (
+                            let i = 0;
+                            i < this.birchWorldGroup.children.length;
+                            i++
+                        ) {
+                            const child = this.birchWorldGroup.children[i];
+                            // Hide core and glow meshes (skip armor plates)
+                            if (
+                                child === this.core ||
+                                child === this.glow ||
+                                child.userData.isBirchCore ||
+                                child.userData.isBirchGlow
+                            ) {
+                                if (child.visible !== coreGlowVisible) {
+                                    child.visible = coreGlowVisible;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                updateCameraTransition(deltaTime) {
+                    const t = this.cameraTransition;
+                    t.progress += deltaTime * 2.0;
+
+                    if (t.progress >= 1) {
+                        t.progress = 1;
+                        t.active = false;
+                        // Only set quaternion - OrbitControls handles target automatically
+                        this.camera.quaternion.copy(t.endRot);
+                        // Re-enable OrbitControls after transition completes
+                        this.controls.enabled = true;
+                        // Enable the toggle button
+                        this.ui.dom.toggleBtn.disabled = false;
+                    } else {
+                        this.camera.quaternion.slerpQuaternions(
+                            t.startRot,
+                            t.endRot,
+                            t.progress,
+                        );
+                    }
+                    this.camera.updateMatrixWorld();
+                }
+
+                updateMovement(deltaTime, camAbs, camDistSq) {
+                    if (this.cameraTransition.active) return;
+                    const camera = this.camera;
+                    const { activeActionState, movementSpeed } = this.input;
+
+                    const moveAmount = movementSpeed * deltaTime * 60;
+                    const rollAmount =
+                        ENGINE_SETTINGS.movement.rollSpeed * deltaTime;
+
+                    if (activeActionState.rollLeft) camera.rotateZ(rollAmount);
+                    if (activeActionState.rollRight)
+                        camera.rotateZ(-rollAmount);
+
+                    // Use pre-computed absolute position to avoid redundant vector operations
+                    const pos =
+                        camAbs ||
+                        this._tempVectors.absolutePos
+                            .copy(camera.position)
+                            .add(this.floatingOffset);
+                    const distanceSquared = camDistSq || pos.lengthSq();
+
+                    // Use optimized built-in translate methods (reduces vector ops and quaternion mult)
+                    // Explicitly cast booleans to 1 or 0 to guarantee mathematical safety
+                    const moveZ =
+                        (activeActionState.backward ? 1 : 0) -
+                        (activeActionState.forward ? 1 : 0);
+                    const moveX =
+                        (activeActionState.strafeRight ? 1 : 0) -
+                        (activeActionState.strafeLeft ? 1 : 0);
+                    if (moveZ !== 0 || moveX !== 0) {
+                        camera.translateZ(moveZ * moveAmount);
+                        camera.translateX(moveX * moveAmount);
+                    }
+
+                    // Remove redundant distance bounds check - OrbitControls already enforces min/maxDistance
+
+                    this.input.consumeMouseDelta(this._tempVectors.mouseDelta);
+                    const dx = this._tempVectors.mouseDelta.x;
+                    const dy = this._tempVectors.mouseDelta.y;
+                    if (dx !== 0 || dy !== 0) {
+                        // O(1) quaternion rotation without allocateOnWorldAxis
+                        const yawAngle =
+                            -dx * ENGINE_SETTINGS.movement.turnSpeed;
+                        const pitchAngle =
+                            -dy * ENGINE_SETTINGS.movement.turnSpeed;
+
+                        // Use pre-allocated quaternions to avoid per-frame allocations
+                        this._tempVectors.qYaw.setFromAxisAngle(
+                            GLOBAL_AXES.axisY,
+                            yawAngle,
+                        );
+                        this._tempVectors.qPitch.setFromAxisAngle(
+                            GLOBAL_AXES.axisX,
+                            pitchAngle,
+                        );
+                        this.camera.quaternion
+                            .multiply(this._tempVectors.qYaw)
+                            .multiply(this._tempVectors.qPitch);
+                    }
+                }
+
+                updateEnvironment(deltaTime, elapsedTime) {
+                    // Pre-compute frame normalizer to reduce ALU operations per frame
+                    const frameNormalizedDelta = deltaTime * 60;
+
+                    // Batch rotation updates to minimize property access overhead
+                    const shells = this.rotatingShells;
+                    const shellCount = shells.length;
+
+                    for (let i = 0; i < shellCount; i++) {
+                        const shell = shells[i];
+                        const speed = shell.userData.rotationSpeed;
+                        const xSpeed = speed.x * frameNormalizedDelta;
+                        const ySpeed = speed.y * frameNormalizedDelta;
+                        shell.rotation.x += xSpeed;
+                        shell.rotation.y += ySpeed;
+                    }
+
+                    // Animate birch world plates and lights
+                    if (this.armorPlates && this.birchWorldGroup) {
+                        this.updateBirchWorldVisibility();
+                        this.animateBirchWorld(deltaTime, elapsedTime);
+                    }
+
+                    // Animate Maginot Defense Perimeter
+                    if (this.maginotGroup) {
+                        this.updateMaginotVisibility();
+                        this.animateMaginotPerimeter(deltaTime, elapsedTime);
+                    }
+
+                    // Update warble shell time uniform
+                    for (const shell of this.rotatingShells) {
+                        if (
+                            shell.userData.warbleMaterial &&
+                            shell.userData.warbleMaterial.uniforms.time
+                        ) {
+                            shell.userData.warbleMaterial.uniforms.time.value =
+                                elapsedTime;
+                        }
+                    }
+
+                    // Update BirchWorld core shader uniforms (glow uniform updates not active)
+                    if (
+                        this.birchWorldGroup &&
+                        this.coreMaterial &&
+                        this.coreMaterial.uniforms?.time
+                    ) {
+                        this.coreMaterial.uniforms.time.value = elapsedTime;
+                    }
+                }
+
+                animate = () => {
+                    if (this._disposed) return;
+                    this._rafId = requestAnimationFrame(this.animate);
+
+                    const now = performance.now();
+                    const deltaTime = Math.min(
+                        (now - this._lastTime) / 1000,
+                        0.1,
+                    );
+                    this._lastTime = now;
+                    this._elapsedTime += deltaTime;
+                    const elapsedTime = this._elapsedTime;
+                    const isTransitioning = this.cameraTransition.active;
+
+                    // --- Floating Origin Check ---
+                    if (
+                        this.camera.position.lengthSq() >
+                        this.FLOATING_ORIGIN_TRIGGER_DISTANCE *
+                            this.FLOATING_ORIGIN_TRIGGER_DISTANCE
+                    ) {
+                        this.shiftOrigin();
+                    }
+                    // -----------------------------
+
+                    // HOISTED: Calculate absolute camera state once per frame to avoid redundant vector ops
+                    const camAbs = this._tempVectors.cameraAbsolute
+                        .copy(this.camera.position)
+                        .add(this.floatingOffset);
+                    const camDistSq = camAbs.lengthSq();
+
+                    if (this.input.isExplorationMode) {
+                        this.updateMovement(deltaTime, camAbs, camDistSq);
+                    } else if (isTransitioning) {
+                        this.updateCameraTransition(deltaTime);
+                    } else {
+                        this.controls.update();
+                    }
+
+                    this.updateEnvironment(deltaTime, elapsedTime);
+
+                    // Render with bloom post-processing if composer exists
+                    if (this.effectComposer) {
+                        this.effectComposer.render();
+                    } else {
+                        this.renderer.render(this.scene, this.camera);
+                    }
+
+                    // Use cached distance - avoid sqrt in hot path
+                    const camera = this.camera;
+                    // Distance changes slowly; use cached value updated every 4 frames
+                    // 25% reduction in sqrt operations at cost of slight UI update latency
+                    // sqrt() is expensive; distance only changes significantly at high velocities
+                    if (this._uiFrameCount % 4 === 0) {
+                        this._lastCalculatedDistance = Math.sqrt(camDistSq);
+                    }
+                    const distance = this._lastCalculatedDistance;
+
+                    // Update bloom intensity based on camera distance
+                    if (this.effectComposer && this.bloomPass) {
+                        const distanceFactor = Math.max(
+                            0,
+                            1 - distance / 50000,
+                        );
+                        this.bloomPass.strength = 0.2 + 0.3 * distanceFactor;
+                        this.bloomPass.threshold =
+                            0.4 + 0.5 * (1 - distanceFactor);
+                        this.bloomPass.radius = 0.1 + 0.2 * distanceFactor;
+                    }
+
+                    // Calculate speed only when needed for navigation (in exploration mode)
+                    let isExplorationMode = this.input.isExplorationMode;
+
+                    // Throttle UI updates to every 2 frames to reduce layout/paint
+                    if (this._uiFrameCount++ % 2 === 0) {
+                        const displayedSpeed =
+                            isExplorationMode && !isTransitioning
+                                ? Math.round(this.input.movementSpeed * 60)
+                                : 0;
+                        this.ui.updateHUD(
+                            distance,
+                            displayedSpeed,
+                            isExplorationMode && !isTransitioning,
+                        );
+                    }
+                };
+
+                dispose() {
+                    if (this._disposed) return;
+                    this._disposed = true;
+
+                    // Cancel animation frame to prevent orphaned loop execution
+                    if (this._rafId) {
+                        cancelAnimationFrame(this._rafId);
+                    }
+                    if (this._resizeTimeoutId) {
+                        clearTimeout(this._resizeTimeoutId);
+                        this._resizeTimeoutId = null;
+                    }
+
+                    // Cleanup event listeners to prevent memory leaks
+                    // Remove WebGL context event listeners from canvas
+                    const canvas = this.renderer?.domElement;
+                    if (canvas) {
+                        canvas.removeEventListener(
+                            "webglcontextlost",
+                            this._onContextLostHandler,
+                            false,
+                        );
+                        canvas.removeEventListener(
+                            "webglcontextrestored",
+                            this._onContextRestoredHandler,
+                            false,
+                        );
+                    }
+
+                    window.removeEventListener("resize", this._handleResize);
+
+                    // Dispose Birch World meshes (shattered core megastructure)
+                    if (this.armorPlates) {
+                        this.armorPlates.forEach((plate) => {
+                            plate.geometry.dispose();
+                            if (Array.isArray(plate.material)) {
+                                plate.material.forEach((m) => m.dispose());
+                            } else {
+                                plate.material.dispose();
+                            }
+                        });
+                    }
+                    if (this.birchWorldGroup) {
+                        // Dispose core and glow meshes
+                        this.birchWorldGroup.children.forEach((child) => {
+                            if (child.geometry) child.geometry.dispose();
+                            if (child.material) {
+                                if (Array.isArray(child.material)) {
+                                    child.material.forEach((m) => m.dispose());
+                                } else {
+                                    child.material.dispose();
+                                }
+                            }
+                        });
+                    }
+
+                    // Dispose Main Star System - CRITICAL: Prevent GPU VRAM leak from 150k stars
+                    if (this.stars) {
+                        this.stars.geometry.dispose();
+                        this.stars.material.dispose();
+                        this.stars = null;
+                    }
+
+                    // Dispose Maginot Defense Perimeter meshes and materials
+                    if (this.maginotGroup) {
+                        this.maginotGroup.children.forEach((child) => {
+                            if (child.geometry) child.geometry.dispose();
+                            if (child.material) {
+                                if (Array.isArray(child.material)) {
+                                    child.material.forEach((m) => m.dispose());
+                                } else {
+                                    child.material.dispose();
+                                }
+                            }
+                        });
+                    }
+
+                    // Dispose Maginot Tethers material if present
+                    if (this.maginotTethers?.material) {
+                        this.maginotTethers.material.dispose();
+                    }
+
+                    for (const shell of this.rotatingShells) {
+                        shell.geometry.dispose();
+                        shell.material.dispose();
+                    }
+
+                    // Clean up warble shell materials
+                    for (const shell of this.rotatingShells) {
+                        if (shell.userData.warbleMaterial) {
+                            shell.userData.warbleMaterial.dispose();
+                        }
+                    }
+
+                    // Dispose effect composer passes
+                    if (this.effectComposer) {
+                        for (const pass of this.effectComposer.passes) {
+                            if (pass.dispose) {
+                                pass.dispose();
+                            }
+                        }
+                        // Explicitly release composer references
+                        this.effectComposer = null;
+                    }
+
+                    // Remove canvas from DOM to prevent memory leaks in SPA context
+                    if (
+                        this.renderer.domElement &&
+                        this.renderer.domElement.parentNode
+                    ) {
+                        this.renderer.domElement.parentNode.removeChild(
+                            this.renderer.domElement,
+                        );
+                    }
+
+                    this.renderer.dispose();
+
+                    // Clean up input event listeners (prevent memory leaks)
+                    if (this.input) {
+                        this.input.dispose();
+                    }
+
+                    // Remove toggle button handler
+                    if (this._toggleHandler) {
+                        this.ui.dom.toggleBtn.removeEventListener(
+                            "click",
+                            this._toggleHandler,
+                        );
+                    }
+
+                    // Clean up OrbitControls
+                    if (this.controls) {
+                        this.controls.dispose();
+                    }
+
+                    // Clear scene to ensure all scene-managed objects are released
+                    this.scene.clear();
+
+                    // Release references for faster garbage collection
+                    this.rotatingShells.length = 0;
+                    this.maginotGroup = null;
+                    this.maginotStars = null;
+                    this.maginotStarsArray = null;
+                    this.maginotInitialPositions = null;
+                    this.maginotTethers = null;
+                    this.scene = null;
+                    this.camera = null;
+                    this.renderer = null;
+                    this.controls = null;
+                    this.ui = null;
+                    this.input = null;
+                    window.engine = null;
+                }
+            }
+
+            // Boot Application
+            window.addEventListener("DOMContentLoaded", () => {
+                window.engine = new GalaxyEngine();
+            });
+
+            // Ensure cleanup on page unload
+            window.addEventListener("beforeunload", () => {
+                if (window.engine) {
+                    window.engine.dispose();
+                }
+            });
+        </script>
+    </body>
+</html>
