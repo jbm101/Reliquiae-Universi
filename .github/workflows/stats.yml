@@ -1,0 +1,43 @@
+name: Update Vault Stats
+on:
+  push:
+    branches: [ v4 ]
+    paths:
+      - 'content/**'
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Calculate Stats
+        id: stats
+        run: |
+          # Count .md files in 'content', ignoring '.smart-env'
+          MD_COUNT=$(find content -name "*.md" -not -path "*/.smart-env/*" | wc -l)
+
+          # Add 1 to the count to account for the Visualizer HTML
+          TOTAL_ENTRIES=$((MD_COUNT + 1))
+
+          # Count total words in 'content', ignoring '.smart-env'
+          WORDS=$(grep -rvh '^---' content --include='*.md' --exclude-dir='.smart-env' | wc -w)
+
+          echo "ENTRIES=$TOTAL_ENTRIES" >> $GITHUB_OUTPUT
+          echo "WORDS=$WORDS" >> $GITHUB_OUTPUT
+
+      - name: Create Shields JSON
+        run: |
+          echo '{"schemaVersion": 1, "label": "Archival Mass", "message": "${{ steps.stats.outputs.WORDS }} words", "color": "orange"}' > archival_mass.json
+          echo '{"schemaVersion": 1, "label": "Entry Count", "message": "${{ steps.stats.outputs.ENTRIES }} items", "color": "blue"}' > entry_count.json
+
+      - name: Push Stats
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add archival_mass.json entry_count.json
+          git commit -m "chore: update archival metrics [skip ci]" || exit 0
+          git push
