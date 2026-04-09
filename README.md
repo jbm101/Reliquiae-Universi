@@ -1,17 +1,14 @@
-# Quartz v4
+# 🌌 Reliquiae Universi
+> "What goes in The Dark stays in The Dark."
 
-> “[One] who works with the door open gets all kinds of interruptions, but [they] also occasionally gets clues as to what the world is and what might be important.” — Richard Hamming
+Welcome to the official repository for the **Reliquiae Universi** world-building project. 
 
-Quartz is a set of tools that helps you publish your [digital garden](https://jzhao.xyz/posts/networked-thought) and notes as a website for free.
+### 🔗 [View the Live Site](https://jbm101.github.io/reliquiae-universi/)
 
-🔗 Read the documentation and get started: https://quartz.jzhao.xyz/
+---
+## 📜 About the Project
+This is a living digital garden containing the lore, maps, and histories of the Terminus Cluster.
 
-[Join the Discord Community](https://discord.gg/cRFFHYye7t)
-
-## Sponsors
-
-<p align="center">
-  <a href="https://github.com/sponsors/jackyzha0">
-    <img src="https://cdn.jsdelivr.net/gh/jackyzha0/jackyzha0/sponsorkit/sponsors.svg" />
-  </a>
-</p>
+## 🛠️ Built With
+* [Quartz 4.0](https://quartz.jzhao.xyz/)
+* [Obsidian](https://obsidian.md/)
