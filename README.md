@@ -3,7 +3,7 @@
 
 Welcome to the official repository for the **Reliquiae Universi** world-building project. 
 
-### 🔗 [View the Live Site](https://jbm101.github.io/reliquiae-universi/)
+### 🔗 [View the Live Site](https://jbm101.github.io/Reliquiae-Universi/)
 
 ---
 ## 📜 About the Project
