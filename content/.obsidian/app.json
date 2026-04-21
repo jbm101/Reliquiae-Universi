@@ -1,3 +1,7 @@
 {
-  "propertiesInDocument": "hidden"
+  "propertiesInDocument": "hidden",
+  "alwaysUpdateLinks": true,
+  "showUnsupportedFiles": false,
+  "readableLineLength": true,
+  "strictLineBreaks": false
 }

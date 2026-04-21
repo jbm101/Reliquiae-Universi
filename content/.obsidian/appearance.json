@@ -1,1 +1,9 @@
-{}
+{
+  "accentColor": "#b30000",
+  "interfaceFontFamily": "DejaVu Sans",
+  "textFontFamily": "DejaVu Sans",
+  "monospaceFontFamily": "DejaVu Sans Mono",
+  "showViewHeader": true,
+  "showRibbon": true,
+  "cssTheme": "Encore"
+}

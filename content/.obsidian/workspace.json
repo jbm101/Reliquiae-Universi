@@ -4,21 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "9af6d6823a7a8780",
+        "id": "27d9a90b48909048",
         "type": "tabs",
         "children": [
           {
-            "id": "ac0222d7daa25003",
+            "id": "d21ce98c5f121c96",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Cosmology/Terminus.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "Terminus"
+              "title": "New tab"
             }
           }
         ]
@@ -34,19 +30,6 @@
         "id": "be673aedd957b6fa",
         "type": "tabs",
         "children": [
-          {
-            "id": "56fd3599956148c8",
-            "type": "leaf",
-            "state": {
-              "type": "file-explorer",
-              "state": {
-                "sortOrder": "alphabetical",
-                "autoReveal": false
-              },
-              "icon": "lucide-folder-closed",
-              "title": "Files"
-            }
-          },
           {
             "id": "b31cec85949b2920",
             "type": "leaf",
@@ -65,16 +48,20 @@
             }
           },
           {
-            "id": "f8070b4186811f55",
+            "id": "e0abb479479b8c1e",
             "type": "leaf",
             "state": {
-              "type": "bookmarks",
-              "state": {},
-              "icon": "lucide-bookmark",
-              "title": "Bookmarks"
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "custom",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Files"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -88,25 +75,6 @@
         "id": "65070e66ea8376f3",
         "type": "tabs",
         "children": [
-          {
-            "id": "afb2f55435b58c38",
-            "type": "leaf",
-            "state": {
-              "type": "backlink",
-              "state": {
-                "file": "Cosmology/Terminus.md",
-                "collapseAll": false,
-                "extraContext": false,
-                "sortOrder": "alphabetical",
-                "showSearch": false,
-                "searchQuery": "",
-                "backlinkCollapsed": false,
-                "unlinkedCollapsed": true
-              },
-              "icon": "links-coming-in",
-              "title": "Backlinks for Terminus"
-            }
-          },
           {
             "id": "f0ff4d7e32bc6f18",
             "type": "leaf",
@@ -137,61 +105,76 @@
             }
           },
           {
-            "id": "7a2322c66e6cbb37",
+            "id": "97f4438c2fcd1de2",
             "type": "leaf",
             "state": {
-              "type": "all-properties",
+              "type": "backlink",
               "state": {
-                "sortOrder": "frequency",
+                "file": "Cosmology/Periphery Zero/index.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
                 "showSearch": false,
-                "searchQuery": ""
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
               },
-              "icon": "lucide-archive",
-              "title": "All properties"
-            }
-          },
-          {
-            "id": "03c2c5f5095c49f3",
-            "type": "leaf",
-            "state": {
-              "type": "outline",
-              "state": {
-                "file": "Cosmology/Terminus.md",
-                "followCursor": false,
-                "showSearch": false,
-                "searchQuery": ""
-              },
-              "icon": "lucide-list",
-              "title": "Outline of Terminus"
+              "icon": "links-coming-in",
+              "title": "Backlinks for index"
             }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "horizontal",
-    "width": 300,
+    "width": 200,
     "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
-      "switcher:Open quick switcher": false,
       "graph:Open graph view": false,
-      "canvas:Create new canvas": false,
-      "daily-notes:Open today's daily note": false,
-      "templates:Insert template": false,
-      "command-palette:Open command palette": false,
-      "bases:Create new base": false
+      "canvas:Create new canvas": true,
+      "templates:Insert template": false
     }
   },
-  "active": "ac0222d7daa25003",
+  "active": "e0abb479479b8c1e",
   "lastOpenFiles": [
-    "Cosmology/Periphery Zero/index.md",
-    "Cosmology/Acheron/index.md",
-    "Cosmology/Acheron/Protostellar Shoals/index.md",
-    "Cosmology/Acheron/Penumbra/index.md",
-    "Cosmology/Acheron/Hyperion/index.md",
-    "Cosmology/Acheron/Firmament/index.md",
-    "Cosmology/Terminus.md",
-    "Cosmology/The Dark.md"
+    "Engineering/General/Chassis/Starships/Military/Flagship",
+    "Engineering/General/Chassis/Starships/Military/Support",
+    "Engineering/General/Chassis/Starships/Military/Battleship",
+    "Engineering/General/Chassis/Starships/Military/Cruiser",
+    "Engineering/General/Chassis/Starships/Military/Destroyer",
+    "Engineering/General/Chassis/Starships/Military/Frigate",
+    "Engineering/General/Chassis/Starships/Military/Corvette",
+    "Engineering/General/Chassis/Starships/Military/Subspace",
+    "Engineering/General/Chassis/Starships/Military/Dreadnought",
+    "Engineering/General/Chassis/Starships/Commercial/Industrial/Construction",
+    "Engineering/General/Chassis/Starships/Commercial/Industrial",
+    "Untitled 1.md",
+    "Sociology/Species/Sapient/Humans.md",
+    "Untitled.md",
+    "Engineering/Deca-Engineering/Space Elevator.md",
+    "Engineering/Hecto-Engineering/Mass Driver.md",
+    "Flagship.md",
+    "Superdreadnought.md",
+    "Dreadnought.md",
+    "Carrier.md",
+    "Battlecruiser.md",
+    "Strike Cruiser.md",
+    "Engineering/General/Materials/Carbon Nanotubes.md",
+    "Engineering/General/Materials/Photonic Matter.md",
+    "Engineering/General/Materials/Strange Matter.md",
+    "Engineering/General/Materials/Carbon Nanolattice.md",
+    "Engineering/General/Materials/Metallic Hydrogen.md",
+    "Engineering/General/Materials/Neutronium.md",
+    "Engineering/Deca-Engineering/Modular Space Station.md",
+    "Engineering/Deca-Engineering/Bernal Sphere.md",
+    "Engineering/Hecto-Engineering/Stanford Torus.md",
+    "Engineering/Kilo-Engineering/O'Neill Cylinder.md",
+    "Engineering/Mega-Engineering/McKendree Cylinder.md",
+    "Engineering/Giga-Engineering/Frameworld.md",
+    "Engineering/Giga-Engineering/Dyson Shell.md",
+    "Engineering/Deca-Engineering/Lofstrom Launch Loop.md"
   ]
 }

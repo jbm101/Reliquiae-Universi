@@ -1,0 +1,455 @@
+{
+  "customOrder": {
+    "/": {
+      "children": [
+        "Glossary.md",
+        "Engineering",
+        "Sociology",
+        "Mechanics",
+        "Cartography",
+        "index.md",
+        "Map.canvas"
+      ],
+      "sortOrder": "custom"
+    },
+    "Cartography": {
+      "children": [
+        "Cartography/The Dark.md",
+        "Cartography/Terminus.md",
+        "Cartography/Periphery Zero",
+        "Cartography/Acheron",
+        "Cartography/Acheron_Map.html"
+      ],
+      "sortOrder": "custom"
+    },
+    "Cartography/Acheron": {
+      "children": [
+        "Cartography/Acheron/Penumbra",
+        "Cartography/Acheron/Firmament",
+        "Cartography/Acheron/Hyperion",
+        "Cartography/Acheron/Protostellar Shoals",
+        "Cartography/Acheron/index.md"
+      ],
+      "sortOrder": "custom"
+    },
+    "Cartography/Acheron/Firmament": {
+      "children": [
+        "Cartography/Acheron/Firmament/index.md"
+      ],
+      "sortOrder": "custom"
+    },
+    "Cartography/Acheron/Hyperion": {
+      "children": [
+        "Cartography/Acheron/Hyperion/index.md"
+      ],
+      "sortOrder": "custom"
+    },
+    "Cartography/Acheron/Penumbra": {
+      "children": [
+        "Cartography/Acheron/Penumbra/index.md"
+      ],
+      "sortOrder": "custom"
+    },
+    "Cartography/Acheron/Protostellar Shoals": {
+      "children": [
+        "Cartography/Acheron/Protostellar Shoals/index.md"
+      ],
+      "sortOrder": "custom"
+    },
+    "Cartography/Periphery Zero": {
+      "children": [
+        "Cartography/Periphery Zero/index.md"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering": {
+      "children": [
+        "Engineering/General",
+        "Engineering/Deca-Engineering",
+        "Engineering/Hecto-Engineering",
+        "Engineering/Kilo-Engineering",
+        "Engineering/Mega-Engineering",
+        "Engineering/Giga-Engineering",
+        "Engineering/Tera-Engineering"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/Deca-Engineering": {
+      "children": [
+        "Engineering/Deca-Engineering/Modular Space Station.md",
+        "Engineering/Deca-Engineering/Bernal Sphere.md",
+        "Engineering/Deca-Engineering/Lofstrom Launch Loop.md",
+        "Engineering/Deca-Engineering/Point-Defense Satellite.md",
+        "Engineering/Deca-Engineering/Space Elevator.md"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/General": {
+      "children": [
+        "Engineering/General/Chassis",
+        "Engineering/General/Materials"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis": {
+      "children": [
+        "Engineering/General/Chassis/Starships",
+        "Engineering/General/Chassis/Mechs"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Mechs": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships": {
+      "children": [
+        "Engineering/General/Chassis/Starships/Civilian",
+        "Engineering/General/Chassis/Starships/Commercial",
+        "Engineering/General/Chassis/Starships/Military"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Civilian": {
+      "children": [
+        "Engineering/General/Chassis/Starships/Civilian/Spark-Class",
+        "Engineering/General/Chassis/Starships/Civilian/Meridian-Class",
+        "Engineering/General/Chassis/Starships/Civilian/Odyssey-Class"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Civilian/Meridian-Class": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Civilian/Odyssey-Class": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Civilian/Spark-Class": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Commercial": {
+      "children": [
+        "Engineering/General/Chassis/Starships/Commercial/Logistics",
+        "Engineering/General/Chassis/Starships/Commercial/Research",
+        "Engineering/General/Chassis/Starships/Commercial/Industrial"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Commercial/Industrial": {
+      "children": [
+        "Engineering/General/Chassis/Starships/Commercial/Industrial/Construction",
+        "Engineering/General/Chassis/Starships/Commercial/Industrial/Extraction"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Commercial/Industrial/Construction": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Commercial/Industrial/Extraction": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Commercial/Logistics": {
+      "children": [
+        "Engineering/General/Chassis/Starships/Commercial/Logistics/Freight",
+        "Engineering/General/Chassis/Starships/Commercial/Logistics/Passenger"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Commercial/Logistics/Freight": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Commercial/Logistics/Passenger": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Commercial/Research": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Military": {
+      "children": [
+        "Engineering/General/Chassis/Starships/Military/Corvette",
+        "Engineering/General/Chassis/Starships/Military/Destroyer",
+        "Engineering/General/Chassis/Starships/Military/Frigate",
+        "Engineering/General/Chassis/Starships/Military/Cruiser",
+        "Engineering/General/Chassis/Starships/Military/Battleship",
+        "Engineering/General/Chassis/Starships/Military/Dreadnought",
+        "Engineering/General/Chassis/Starships/Military/Carrier",
+        "Engineering/General/Chassis/Starships/Military/Flagship",
+        "Engineering/General/Chassis/Starships/Military/Subspace",
+        "Engineering/General/Chassis/Starships/Military/Support"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Military/Battleship": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Military/Carrier": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Military/Corvette": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Military/Cruiser": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Military/Destroyer": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Military/Flagship": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Military/Frigate": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Military/Subspace": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Military/Support": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Materials": {
+      "children": [
+        "Engineering/General/Materials/Carbon Nanolattice.md",
+        "Engineering/General/Materials/Carbon Nanotubes.md",
+        "Engineering/General/Materials/Strange Matter.md",
+        "Engineering/General/Materials/Metallic Hydrogen.md",
+        "Engineering/General/Materials/Photonic Matter.md",
+        "Engineering/General/Materials/Neutronium.md"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/Giga-Engineering": {
+      "children": [
+        "Engineering/Giga-Engineering/Behemoth Planetcraft.md",
+        "Engineering/Giga-Engineering/Hyperstructural Assembly Yard.md",
+        "Engineering/Giga-Engineering/Hawking Radiation and Accretion Emission Macro-Collector.md",
+        "Engineering/Giga-Engineering/Shkadov Thruster.md",
+        "Engineering/Giga-Engineering/Nicoll-Dyson Beam.md",
+        "Engineering/Giga-Engineering/Nidavellir Hyperforge.md",
+        "Engineering/Giga-Engineering/Frameworld.md",
+        "Engineering/Giga-Engineering/Alderson Disk.md",
+        "Engineering/Giga-Engineering/Dyson Shell.md",
+        "Engineering/Giga-Engineering/Ringworld.md",
+        "Engineering/Giga-Engineering/Stellar Systemcraft.md",
+        "Engineering/Giga-Engineering/Matrioshka Brain.md"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/Hecto-Engineering": {
+      "children": [
+        "Engineering/Hecto-Engineering/Bio-Dome Habitat.md",
+        "Engineering/Hecto-Engineering/Communication Array.md",
+        "Engineering/Hecto-Engineering/Stanford Torus.md",
+        "Engineering/Hecto-Engineering/Mass Driver.md"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/Kilo-Engineering": {
+      "children": [
+        "Engineering/Kilo-Engineering/Orbital Artificial Ecosystem.md",
+        "Engineering/Kilo-Engineering/Asteroid Artillery.md",
+        "Engineering/Kilo-Engineering/Asteroid Manufactory.md",
+        "Engineering/Kilo-Engineering/O'Neill Cylinder.md",
+        "Engineering/Kilo-Engineering/Cloud City.md",
+        "Engineering/Kilo-Engineering/Stellar Particle Accelerator.md"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/Mega-Engineering": {
+      "children": [
+        "Engineering/Mega-Engineering/Attack Moon.md",
+        "Engineering/Mega-Engineering/Deep Space Citadel.md",
+        "Engineering/Mega-Engineering/Automated Stripmine.md",
+        "Engineering/Mega-Engineering/Biological Impetuous Growth Vat.md",
+        "Engineering/Mega-Engineering/Crystal Megabore.md",
+        "Engineering/Mega-Engineering/McKendree Cylinder.md",
+        "Engineering/Mega-Engineering/Equatorial Shipyard.md",
+        "Engineering/Mega-Engineering/Interstellar Habitat.md",
+        "Engineering/Mega-Engineering/Interstellar Ringworld.md",
+        "Engineering/Mega-Engineering/Kugelblitz Containment Silo.md",
+        "Engineering/Mega-Engineering/Dyson Swarm-Sphere.md",
+        "Engineering/Mega-Engineering/Maginot World.md",
+        "Engineering/Mega-Engineering/Orbital Arcology-Elysium.md",
+        "Engineering/Mega-Engineering/Planetary Computing Complex.md",
+        "Engineering/Mega-Engineering/Lunar Speculorefractor.md",
+        "Engineering/Mega-Engineering/Neutronium Gigaforge.md",
+        "Engineering/Mega-Engineering/Planetary Dockyard.md",
+        "Engineering/Mega-Engineering/Star Lifter.md",
+        "Engineering/Mega-Engineering/Super-atmospheric Umbegaseous Collecto-Condenser.md",
+        "Engineering/Mega-Engineering/Yggdrasil Orchid Complex.md",
+        "Engineering/Mega-Engineering/Penrose Sphere.md"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/Tera-Engineering": {
+      "children": [
+        "Engineering/Tera-Engineering/Birch World.md"
+      ],
+      "sortOrder": "custom"
+    },
+    "Mechanics": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology": {
+      "children": [
+        "Sociology/Culture",
+        "Sociology/Species",
+        "Sociology/History",
+        "Sociology/Factions"
+      ],
+      "sortOrder": "custom"
+    },
+    "Sociology/Culture": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions": {
+      "children": [
+        "Sociology/Factions/Governments",
+        "Sociology/Factions/Corporations",
+        "Sociology/Factions/Criminal"
+      ],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Corporations": {
+      "children": [
+        "Sociology/Factions/Corporations/Conglomerate",
+        "Sociology/Factions/Corporations/Technology",
+        "Sociology/Factions/Corporations/Infrastructure",
+        "Sociology/Factions/Corporations/Logistics",
+        "Sociology/Factions/Corporations/Healthcare",
+        "Sociology/Factions/Corporations/Consumer Goods",
+        "Sociology/Factions/Corporations/Media",
+        "Sociology/Factions/Corporations/Financial",
+        "Sociology/Factions/Corporations/Resource"
+      ],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Corporations/Conglomerate": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Corporations/Consumer Goods": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Corporations/Financial": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Corporations/Healthcare": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Corporations/Infrastructure": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Corporations/Logistics": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Corporations/Media": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Corporations/Resource": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Corporations/Technology": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Criminal": {
+      "children": [
+        "Sociology/Factions/Criminal/Cybercrime",
+        "Sociology/Factions/Criminal/Black Market",
+        "Sociology/Factions/Criminal/Assassination",
+        "Sociology/Factions/Criminal/Pirate",
+        "Sociology/Factions/Criminal/Smuggling"
+      ],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Criminal/Assassination": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Criminal/Black Market": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Criminal/Cybercrime": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Criminal/Pirate": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Criminal/Smuggling": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Governments": {
+      "children": [
+        "Sociology/Factions/Governments/Supranational",
+        "Sociology/Factions/Governments/Sovereignties"
+      ],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Governments/Sovereignties": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Factions/Governments/Supranational": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/History": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Species": {
+      "children": [
+        "Sociology/Species/Sapient",
+        "Sociology/Species/Non-Sapient"
+      ],
+      "sortOrder": "custom"
+    },
+    "Sociology/Species/Non-Sapient": {
+      "children": [],
+      "sortOrder": "custom"
+    },
+    "Sociology/Species/Sapient": {
+      "children": [
+        "Sociology/Species/Sapient/Humans.md"
+      ],
+      "sortOrder": "custom"
+    },
+    "Engineering/General/Chassis/Starships/Military/Dreadnought": {
+      "children": [],
+      "sortOrder": "custom"
+    }
+  },
+  "sortOrder": "custom",
+  "debugMode": false,
+  "newItemPlacement": "top"
+}

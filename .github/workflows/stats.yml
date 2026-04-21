@@ -17,14 +17,12 @@ jobs:
       - name: Calculate Stats
         id: stats
         run: |
-          # Count .md files in 'content', ignoring '.smart-env'
-          MD_COUNT=$(find content -name "*.md" -not -path "*/.smart-env/*" | wc -l)
+          MD_COUNT=$(find content -name "*.md" -not -path "*/.smart-env/*" -not -path "*/.obsidian/*" | wc -l)
 
           # Add 1 to the count to account for the Visualizer HTML
           TOTAL_ENTRIES=$((MD_COUNT + 1))
 
-          # Count total words in 'content', ignoring '.smart-env'
-          WORDS=$(grep -rvh '^---' content --include='*.md' --exclude-dir='.smart-env' | wc -w)
+          WORDS=$(grep -rvh '^---' content --include='*.md' --exclude-dir={.smart-env,.obsidian} | wc -w)
 
           echo "ENTRIES=$TOTAL_ENTRIES" >> $GITHUB_OUTPUT
           echo "WORDS=$WORDS" >> $GITHUB_OUTPUT
