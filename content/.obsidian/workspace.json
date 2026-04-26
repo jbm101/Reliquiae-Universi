@@ -11,10 +11,15 @@
             "id": "d21ce98c5f121c96",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "Cartography/Terminus.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": false
+              },
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "Terminus"
             }
           }
         ]
@@ -138,8 +143,10 @@
       "templates:Insert template": false
     }
   },
-  "active": "e0abb479479b8c1e",
+  "active": "d21ce98c5f121c96",
   "lastOpenFiles": [
+    "Sociology/History/Untitled.md",
+    "Sociology/History/Untitled",
     "Engineering/General/Chassis/Starships/Military/Flagship",
     "Engineering/General/Chassis/Starships/Military/Support",
     "Engineering/General/Chassis/Starships/Military/Battleship",
@@ -149,8 +156,6 @@
     "Engineering/General/Chassis/Starships/Military/Corvette",
     "Engineering/General/Chassis/Starships/Military/Subspace",
     "Engineering/General/Chassis/Starships/Military/Dreadnought",
-    "Engineering/General/Chassis/Starships/Commercial/Industrial/Construction",
-    "Engineering/General/Chassis/Starships/Commercial/Industrial",
     "Untitled 1.md",
     "Sociology/Species/Sapient/Humans.md",
     "Untitled.md",
@@ -174,7 +179,6 @@
     "Engineering/Kilo-Engineering/O'Neill Cylinder.md",
     "Engineering/Mega-Engineering/McKendree Cylinder.md",
     "Engineering/Giga-Engineering/Frameworld.md",
-    "Engineering/Giga-Engineering/Dyson Shell.md",
-    "Engineering/Deca-Engineering/Lofstrom Launch Loop.md"
+    "Engineering/Giga-Engineering/Dyson Shell.md"
   ]
 }

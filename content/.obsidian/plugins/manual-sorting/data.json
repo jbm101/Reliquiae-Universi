@@ -207,6 +207,10 @@
       "children": [],
       "sortOrder": "custom"
     },
+    "Engineering/General/Chassis/Starships/Military/Dreadnought": {
+      "children": [],
+      "sortOrder": "custom"
+    },
     "Engineering/General/Chassis/Starships/Military/Flagship": {
       "children": [],
       "sortOrder": "custom"
@@ -424,6 +428,13 @@
       "sortOrder": "custom"
     },
     "Sociology/History": {
+      "children": [
+        "Sociology/History/Untitled",
+        "Sociology/History/Untitled.md"
+      ],
+      "sortOrder": "custom"
+    },
+    "Sociology/History/Untitled": {
       "children": [],
       "sortOrder": "custom"
     },
@@ -442,10 +453,6 @@
       "children": [
         "Sociology/Species/Sapient/Humans.md"
       ],
-      "sortOrder": "custom"
-    },
-    "Engineering/General/Chassis/Starships/Military/Dreadnought": {
-      "children": [],
       "sortOrder": "custom"
     }
   },
